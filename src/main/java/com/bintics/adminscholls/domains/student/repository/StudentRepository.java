@@ -18,8 +18,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Optional<Student> findByPublicId(String publicId);
 
-    List<Student> findByGradeAndSection(String grade, String section);
-
     @Query("SELECT s FROM Student s WHERE s.isActive = true AND " +
            "(LOWER(s.firstName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(s.lastName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
@@ -29,5 +27,4 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("SELECT COUNT(s) FROM Student s WHERE s.isActive = true")
     Long countActiveStudents();
 
-    Optional<Student> findByEmailIgnoreCase(String email);
 }

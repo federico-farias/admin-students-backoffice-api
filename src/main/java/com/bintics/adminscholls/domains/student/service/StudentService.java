@@ -3,7 +3,6 @@ package com.bintics.adminscholls.domains.student.service;
 import com.bintics.adminscholls.domains.student.dto.StudentDTO;
 import com.bintics.adminscholls.domains.student.model.Student;
 import com.bintics.adminscholls.domains.student.repository.StudentRepository;
-import com.bintics.adminscholls.domains.group.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,6 @@ import java.util.Optional;
 public class StudentService {
 
     private final StudentRepository studentRepository;
-    private final GroupRepository groupRepository;
 
     public List<StudentDTO> getAllStudents() {
         return studentRepository.findAll()
