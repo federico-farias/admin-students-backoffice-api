@@ -1,7 +1,12 @@
 package com.bintics.adminscholls.domains.student.service;
 
+import com.bintics.adminscholls.domains.student.repository.EmergencyContactRepository;
 import com.bintics.adminscholls.domains.student.dto.StudentDTO;
+import com.bintics.adminscholls.domains.student.exception.EmergencyContactsNotFoundException;
+import com.bintics.adminscholls.domains.student.exception.StudentAlreadyExistsException;
 import com.bintics.adminscholls.domains.student.model.Student;
+import com.bintics.adminscholls.domains.student.model.StudentEmergencyContact;
+import com.bintics.adminscholls.domains.student.repository.StudentEmergencyContactRepository;
 import com.bintics.adminscholls.domains.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +23,8 @@ import java.util.Optional;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final EmergencyContactRepository emergencyContactRepository;
+    private final StudentEmergencyContactRepository studentEmergencyContactRepository;
 
     public List<StudentDTO> getAllStudents() {
         return studentRepository.findAll()
@@ -49,128 +56,96 @@ public class StudentService {
     }
 
     public StudentDTO createStudent(StudentDTO studentDTO) {
-        Student student = Student.builder()
-                .firstName(studentDTO.getFirstName())
-                .lastName(studentDTO.getLastName())
-                .email(studentDTO.getEmail())
-                .phone(studentDTO.getPhone())
-                .dateOfBirth(studentDTO.getDateOfBirth())
-                .grade(studentDTO.getGrade())
-                .section(studentDTO.getSection())
-                .parentName(studentDTO.getParentName())
-                .parentPhone(studentDTO.getParentPhone())
-                .parentEmail(studentDTO.getParentEmail())
-                .address(studentDTO.getAddress())
-                .emergencyContactName(studentDTO.getEmergencyContactName())
-                .emergencyContactPhone(studentDTO.getEmergencyContactPhone())
-                .emergencyContactRelationship(studentDTO.getEmergencyContactRelationship())
-                .isActive(true)
-                .build();
+        // 1. Validar si el estudiante ya existe
+        validateStudentDoesNotExist(studentDTO);
 
-        // Nota: La asignación a grupos ahora se maneja mediante StudentGroupAssignment
-        // No asignamos directamente el grupo aquí - usar StudentGroupAssignmentService para eso
+        // 2. Validar que todos los contactos de emergencia existan
+        validateEmergencyContactsExist(studentDTO.getEmergencyContactIds());
+
+        // 3. Crear el estudiante
+        Student student = new Student(
+                studentDTO.getFirstName(),
+                studentDTO.getLastName(),
+                studentDTO.getEmail(),
+                studentDTO.getPhone(),
+                studentDTO.getDateOfBirth(),
+                studentDTO.getAddress()
+        );
 
         Student savedStudent = studentRepository.save(student);
+
+        // 4. Asociar los contactos de emergencia
+        associateEmergencyContacts(savedStudent.getPublicId(), studentDTO.getEmergencyContactIds());
+
         return new StudentDTO(savedStudent);
     }
 
-    public Optional<StudentDTO> updateStudent(Long id, StudentDTO studentDTO) {
-        return studentRepository.findById(id)
-                .map(existingStudent -> {
-                    existingStudent.setFirstName(studentDTO.getFirstName());
-                    existingStudent.setLastName(studentDTO.getLastName());
-                    existingStudent.setEmail(studentDTO.getEmail());
-                    existingStudent.setPhone(studentDTO.getPhone());
-                    existingStudent.setDateOfBirth(studentDTO.getDateOfBirth());
-                    existingStudent.setGrade(studentDTO.getGrade());
-                    existingStudent.setSection(studentDTO.getSection());
-                    existingStudent.setParentName(studentDTO.getParentName());
-                    existingStudent.setParentPhone(studentDTO.getParentPhone());
-                    existingStudent.setParentEmail(studentDTO.getParentEmail());
-                    existingStudent.setAddress(studentDTO.getAddress());
-                    existingStudent.setEmergencyContactName(studentDTO.getEmergencyContactName());
-                    existingStudent.setEmergencyContactPhone(studentDTO.getEmergencyContactPhone());
-                    existingStudent.setEmergencyContactRelationship(studentDTO.getEmergencyContactRelationship());
+    private void validateStudentDoesNotExist(StudentDTO studentDTO) {
+        // Validar por email si está presente
+        if (studentDTO.getEmail() != null && !studentDTO.getEmail().trim().isEmpty()) {
+            if (studentRepository.existsByEmailAndIsActiveTrue(studentDTO.getEmail())) {
+                throw new StudentAlreadyExistsException(
+                        "Ya existe un estudiante activo con el email: " + studentDTO.getEmail());
+            }
+        }
 
-                    // Nota: La gestión de grupos ahora se maneja mediante StudentGroupAssignment
-                    // Usar StudentGroupAssignmentService para cambios de grupo
-
-                    Student savedStudent = studentRepository.save(existingStudent);
-                    return new StudentDTO(savedStudent);
-                });
+        // Validar por combinación de nombre, apellido y fecha de nacimiento
+        if (studentRepository.existsByFirstNameAndLastNameAndDateOfBirth(
+                studentDTO.getFirstName(),
+                studentDTO.getLastName(),
+                studentDTO.getDateOfBirth())) {
+            throw new StudentAlreadyExistsException(
+                    String.format("Ya existe un estudiante activo con el nombre '%s %s' y fecha de nacimiento %s",
+                            studentDTO.getFirstName(),
+                            studentDTO.getLastName(),
+                            studentDTO.getDateOfBirth()));
+        }
     }
 
-    public Optional<StudentDTO> updateStudentByPublicId(String publicId, StudentDTO studentDTO) {
-        return studentRepository.findByPublicId(publicId)
-                .map(existingStudent -> {
-                    existingStudent.setFirstName(studentDTO.getFirstName());
-                    existingStudent.setLastName(studentDTO.getLastName());
-                    existingStudent.setEmail(studentDTO.getEmail());
-                    existingStudent.setPhone(studentDTO.getPhone());
-                    existingStudent.setDateOfBirth(studentDTO.getDateOfBirth());
-                    existingStudent.setGrade(studentDTO.getGrade());
-                    existingStudent.setSection(studentDTO.getSection());
-                    existingStudent.setParentName(studentDTO.getParentName());
-                    existingStudent.setParentPhone(studentDTO.getParentPhone());
-                    existingStudent.setParentEmail(studentDTO.getParentEmail());
-                    existingStudent.setAddress(studentDTO.getAddress());
-                    existingStudent.setEmergencyContactName(studentDTO.getEmergencyContactName());
-                    existingStudent.setEmergencyContactPhone(studentDTO.getEmergencyContactPhone());
-                    existingStudent.setEmergencyContactRelationship(studentDTO.getEmergencyContactRelationship());
+    private void validateEmergencyContactsExist(List<String> emergencyContactIds) {
+        if (emergencyContactIds == null || emergencyContactIds.isEmpty()) {
+            throw new EmergencyContactsNotFoundException(List.of());
+        }
 
-                    // Nota: La gestión de grupos ahora se maneja mediante StudentGroupAssignment
-                    // Usar StudentGroupAssignmentService para cambios de grupo
+        List<String> existingContactIds = emergencyContactRepository.findExistingPublicIds(emergencyContactIds);
 
-                    Student savedStudent = studentRepository.save(existingStudent);
-                    return new StudentDTO(savedStudent);
-                });
+        List<String> notFoundContactIds = emergencyContactIds.stream()
+                .filter(id -> !existingContactIds.contains(id))
+                .toList();
+
+        if (!notFoundContactIds.isEmpty()) {
+            throw new EmergencyContactsNotFoundException(notFoundContactIds);
+        }
     }
 
-    // DEPRECATED: Estos métodos están obsoletos - usar StudentGroupAssignmentService
-    @Deprecated
-    public boolean assignToGroup(Long studentId, Long groupId) {
-        // Este método está obsoleto. Usar StudentGroupAssignmentService.createAssignment()
-        throw new UnsupportedOperationException("Usar StudentGroupAssignmentService.createAssignment() en su lugar");
+    private void associateEmergencyContacts(String studentPublicId, List<String> emergencyContactIds) {
+        for (String contactId : emergencyContactIds) {
+            StudentEmergencyContact association = new StudentEmergencyContact(studentPublicId, contactId);
+            studentEmergencyContactRepository.save(association);
+        }
     }
 
-    @Deprecated
-    public boolean assignToGroupByPublicId(String publicId, Long groupId) {
-        // Este método está obsoleto. Usar StudentGroupAssignmentService.createAssignment()
-        throw new UnsupportedOperationException("Usar StudentGroupAssignmentService.createAssignment() en su lugar");
+    public StudentDTO updateStudent(String publicId, StudentDTO studentDTO) {
+        Student student = studentRepository.findByPublicId(publicId)
+                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
+
+        // Actualizar campos básicos
+        student.setFirstName(studentDTO.getFirstName());
+        student.setLastName(studentDTO.getLastName());
+        student.setEmail(studentDTO.getEmail());
+        student.setPhone(studentDTO.getPhone());
+        student.setDateOfBirth(studentDTO.getDateOfBirth());
+        student.setAddress(studentDTO.getAddress());
+
+        Student updatedStudent = studentRepository.save(student);
+        return new StudentDTO(updatedStudent);
     }
 
-    public void deactivateStudent(Long id) {
-        studentRepository.findById(id)
-                .ifPresent(student -> {
-                    student.setIsActive(false);
-                    studentRepository.save(student);
-                });
-    }
+    public void deleteStudent(String publicId) {
+        Student student = studentRepository.findByPublicId(publicId)
+                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
 
-    public void deactivateStudentByPublicId(String publicId) {
-        studentRepository.findByPublicId(publicId)
-                .ifPresent(student -> {
-                    student.setIsActive(false);
-                    studentRepository.save(student);
-                });
-    }
-
-    public void deleteStudent(Long id) {
-        studentRepository.deleteById(id);
-    }
-
-    public void deleteStudentByPublicId(String publicId) {
-        studentRepository.findByPublicId(publicId)
-                .ifPresent(student -> studentRepository.delete(student));
-    }
-
-    @Deprecated
-    public List<StudentDTO> getStudentsByGroup(Long groupId) {
-        // Este método está obsoleto. Usar StudentGroupAssignmentService.getAssignmentsByGroupCode()
-        throw new UnsupportedOperationException("Usar StudentGroupAssignmentService.getAssignmentsByGroupCode() en su lugar");
-    }
-
-    public Long getActiveStudentsCount() {
-        return studentRepository.countActiveStudents();
+        student.setIsActive(false);
+        studentRepository.save(student);
     }
 }

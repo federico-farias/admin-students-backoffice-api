@@ -47,6 +47,29 @@ INSERT INTO students (public_id, first_name, last_name, email, phone, date_of_bi
 ('b1a1e1c0-0021-4a1a-8a1a-000000000021', 'Regina', 'Campos', 'regina.campos@email.com', '123-456-7803', '2011-03-21', 'Segundo', 'A', 'Claudia Campos', '987-654-3232', 'claudia.campos@email.com', 'Ronda 369, Ciudad', '2024-01-10', true, 'Alejandro Campos', '555-0143', 'Padre', 7, NOW(), NOW()),
 ('b1a1e1c0-0022-4a1a-8a1a-000000000022', 'Sebastián', 'Peña', 'sebastian.pena@email.com', '123-456-7804', '2015-12-01', 'Primero', 'A', 'Beatriz Peña', '987-654-3233', 'beatriz.pena@email.com', 'Circuito 741, Ciudad', '2024-02-20', true, 'Ricardo Peña', '555-0144', 'Padre', 5, NOW(), NOW());
 
+-- Insertar algunos contactos de emergencia de prueba
+INSERT INTO emergency_contacts (public_id, first_name, last_name, relationship, phone, email, address, is_active, created_at, updated_at)
+VALUES
+    (UUID(), 'María', 'González', 'Madre', '555-0101', 'maria.gonzalez@email.com', 'Av. Principal 123', true, NOW(), NOW()),
+    (UUID(), 'Carlos', 'Rodríguez', 'Padre', '555-0102', 'carlos.rodriguez@email.com', 'Calle Secundaria 456', true, NOW(), NOW()),
+    (UUID(), 'Ana', 'López', 'Abuela', '555-0103', 'ana.lopez@email.com', 'Plaza Central 789', true, NOW(), NOW()),
+    (UUID(), 'Roberto', 'Martínez', 'Tío', '555-0104', 'roberto.martinez@email.com', 'Barrio Norte 321', true, NOW(), NOW()),
+    (UUID(), 'Carmen', 'Díaz', 'Madre', '555-0105', 'carmen.diaz@email.com', 'Zona Sur 654', true, NOW(), NOW()),
+    (UUID(), 'Luis', 'Hernández', 'Padre', '555-0106', 'luis.hernandez@email.com', 'Centro 987', true, NOW(), NOW()),
+    (UUID(), 'Patricia', 'Silva', 'Madrina', '555-0107', 'patricia.silva@email.com', 'Colonia Este 147', true, NOW(), NOW()),
+    (UUID(), 'Fernando', 'Castro', 'Padrino', '555-0108', 'fernando.castro@email.com', 'Sector Oeste 258', true, NOW(), NOW()),
+    (UUID(), 'Elena', 'Morales', 'Tía', '555-0109', 'elena.morales@email.com', 'Residencial Norte 369', true, NOW(), NOW()),
+    (UUID(), 'Miguel', 'Vargas', 'Abuelo', '555-0110', 'miguel.vargas@email.com', 'Urbanización Sur 741', true, NOW(), NOW());
+
+-- Insertar grupos de ejemplo
+INSERT INTO `groups` (group_code, academic_year, academic_level, grade, name, max_students, is_active, created_at, updated_at)
+VALUES
+    ('2024-MATERNAL-1-A', '2024', 'MATERNAL', '1', 'A', 15, true, NOW(), NOW()),
+    ('2024-PREESCOLAR-2-B', '2024', 'PREESCOLAR', '2', 'B', 20, true, NOW(), NOW()),
+    ('2024-PRIMARIA-3-A', '2024', 'PRIMARIA', '3', 'A', 25, true, NOW(), NOW()),
+    ('2024-PRIMARIA-4-B', '2024', 'PRIMARIA', '4', 'B', 25, true, NOW(), NOW()),
+    ('2024-SECUNDARIA-1-A', '2024', 'SECUNDARIA', '1', 'A', 30, true, NOW(), NOW());
+
 -- Insertar pagos de ejemplo
 INSERT INTO payments (student_id, amount, payment_date, description, payment_method, status, due_date, period, period_type, breakfast_package_id, notes, created_at, updated_at) VALUES
 (1, 150.00, '2025-01-05', 'Desayuno - Enero 2025', 'TRANSFERENCIA', 'PAGADO', '2025-01-31', 'Enero 2025', 'MENSUAL', 2, 'Pago completo del mes', NOW(), NOW()),

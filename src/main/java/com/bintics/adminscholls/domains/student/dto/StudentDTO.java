@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,63 +18,33 @@ public class StudentDTO {
     private String publicId;
 
     @NotBlank(message = "El nombre es obligatorio")
-    @Size(max = 100)
+    @Size(max = 100, message = "El nombre no puede exceder 100 caracteres")
     private String firstName;
 
     @NotBlank(message = "El apellido es obligatorio")
-    @Size(max = 100)
+    @Size(max = 100, message = "El apellido no puede exceder 100 caracteres")
     private String lastName;
 
     @Email(message = "El email debe tener un formato válido")
-    @Size(max = 255)
+    @Size(max = 255, message = "El email no puede exceder 255 caracteres")
     private String email;
 
-    @Size(max = 20)
+    @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
     private String phone;
 
     @NotNull(message = "La fecha de nacimiento es obligatoria")
     private LocalDate dateOfBirth;
 
-    @NotBlank(message = "El grado es obligatorio")
-    @Size(max = 50)
-    private String grade;
-
-    @NotBlank(message = "La sección es obligatoria")
-    @Size(max = 10)
-    private String section;
-
-    @NotBlank(message = "El nombre del padre/madre es obligatorio")
-    @Size(max = 200)
-    private String parentName;
-
-    @NotBlank(message = "El teléfono del padre/madre es obligatorio")
-    @Size(max = 20)
-    private String parentPhone;
-
-    @Email(message = "El email del padre/madre debe tener un formato válido")
-    @Size(max = 255)
-    private String parentEmail;
-
-    @NotBlank(message = "La dirección es obligatoria")
-    @Size(max = 500)
+    @Size(max = 500, message = "La dirección no puede exceder 500 caracteres")
     private String address;
+
+    // Lista de publicId de contactos de emergencia
+    @NotEmpty(message = "Debe proporcionar al menos un contacto de emergencia")
+    private List<String> emergencyContactIds;
 
     private Boolean isActive;
 
-    // Emergency Contact
-    @Size(max = 200)
-    private String emergencyContactName;
-
-    @Size(max = 20)
-    private String emergencyContactPhone;
-
-    @Size(max = 100)
-    private String emergencyContactRelationship;
-
-    private Long groupId;
-    private String groupName;
-
-    // Constructor para convertir desde entidad
+    // Constructor para crear desde entidad
     public StudentDTO(Student student) {
         this.id = student.getId();
         this.publicId = student.getPublicId();
@@ -82,16 +53,21 @@ public class StudentDTO {
         this.email = student.getEmail();
         this.phone = student.getPhone();
         this.dateOfBirth = student.getDateOfBirth();
-        this.grade = student.getGrade();
-        this.section = student.getSection();
-        this.parentName = student.getParentName();
-        this.parentPhone = student.getParentPhone();
-        this.parentEmail = student.getParentEmail();
         this.address = student.getAddress();
         this.isActive = student.getIsActive();
-        this.emergencyContactName = student.getEmergencyContactName();
-        this.emergencyContactPhone = student.getEmergencyContactPhone();
-        this.emergencyContactRelationship = student.getEmergencyContactRelationship();
+        // Los contactos de emergencia se cargarán por separado si es necesario
+    }
+
+    // Constructor para creación (sin publicId)
+    public StudentDTO(String firstName, String lastName, String email, String phone,
+                     LocalDate dateOfBirth, String address, List<String> emergencyContactIds) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.dateOfBirth = dateOfBirth;
+        this.address = address;
+        this.emergencyContactIds = emergencyContactIds;
     }
 
     // Utility methods

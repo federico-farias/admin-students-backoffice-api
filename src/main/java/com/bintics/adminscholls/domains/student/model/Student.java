@@ -24,9 +24,8 @@ public class Student extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Builder.Default
-    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
-    private String publicId = UUID.randomUUID().toString();
+    @Column(name = "public_id", unique = true, nullable = false)
+    private String publicId;
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 100)
@@ -40,7 +39,7 @@ public class Student extends BaseEntity {
 
     @Email(message = "El email debe tener un formato válido")
     @Size(max = 255)
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @Size(max = 20)
@@ -50,16 +49,6 @@ public class Student extends BaseEntity {
     @NotNull(message = "La fecha de nacimiento es obligatoria")
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
-
-    @NotBlank(message = "El grado es obligatorio")
-    @Size(max = 50)
-    @Column(name = "grade", nullable = false)
-    private String grade;
-
-    @NotBlank(message = "La sección es obligatoria")
-    @Size(max = 10)
-    @Column(name = "section", nullable = false)
-    private String section;
 
     @NotBlank(message = "El nombre del padre/madre es obligatorio")
     @Size(max = 200)
@@ -106,19 +95,26 @@ public class Student extends BaseEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Constructor personalizado para casos comunes
-    public Student(String firstName, String lastName, LocalDate dateOfBirth,
-                   String grade, String section, String parentName, String parentPhone,
-                   String address) {
+    public Student(
+            @NotBlank(message = "El nombre es obligatorio") @Size(max = 100, message = "El nombre no puede exceder 100 caracteres") String firstName,
+            @NotBlank(message = "El apellido es obligatorio") @Size(max = 100, message = "El apellido no puede exceder 100 caracteres") String lastName,
+            @Email(message = "El email debe tener un formato válido") @Size(max = 255, message = "El email no puede exceder 255 caracteres") String email,
+            @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres") String phone,
+            @NotNull(message = "La fecha de nacimiento es obligatoria") LocalDate dateOfBirth,
+            @Size(max = 500, message = "La dirección no puede exceder 500 caracteres") String address) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
         this.dateOfBirth = dateOfBirth;
-        this.grade = grade;
-        this.section = section;
-        this.parentName = parentName;
-        this.parentPhone = parentPhone;
         this.address = address;
-        this.isActive = true;
+    }
+
+    @PrePersist
+    private void generatePublicId() {
+        if (publicId == null || publicId.isEmpty()) {
+            publicId = UUID.randomUUID().toString();
+        }
     }
 
     // Utility method
