@@ -80,10 +80,6 @@ public class Student {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @NotNull(message = "La fecha de inscripción es obligatoria")
-    @Column(name = "enrollment_date", nullable = false)
-    private LocalDate enrollmentDate;
-
     @Builder.Default
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
@@ -116,7 +112,7 @@ public class Student {
     // Constructor personalizado para casos comunes
     public Student(String firstName, String lastName, LocalDate dateOfBirth,
                    String grade, String section, String parentName, String parentPhone,
-                   String address, LocalDate enrollmentDate) {
+                   String address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
@@ -125,7 +121,6 @@ public class Student {
         this.parentName = parentName;
         this.parentPhone = parentPhone;
         this.address = address;
-        this.enrollmentDate = enrollmentDate;
         this.isActive = true;
     }
 

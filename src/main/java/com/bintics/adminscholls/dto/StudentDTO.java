@@ -58,9 +58,6 @@ public class StudentDTO {
     @Size(max = 500)
     private String address;
 
-    @NotNull(message = "La fecha de inscripción es obligatoria")
-    private LocalDate enrollmentDate;
-
     private Boolean isActive;
 
     // Emergency Contact
@@ -91,7 +88,6 @@ public class StudentDTO {
         this.parentPhone = student.getParentPhone();
         this.parentEmail = student.getParentEmail();
         this.address = student.getAddress();
-        this.enrollmentDate = student.getEnrollmentDate();
         this.isActive = student.getIsActive();
         this.emergencyContactName = student.getEmergencyContactName();
         this.emergencyContactPhone = student.getEmergencyContactPhone();

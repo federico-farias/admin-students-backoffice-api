@@ -64,7 +64,6 @@ public class StudentService {
                 .parentPhone(studentDTO.getParentPhone())
                 .parentEmail(studentDTO.getParentEmail())
                 .address(studentDTO.getAddress())
-                .enrollmentDate(studentDTO.getEnrollmentDate())
                 .emergencyContactName(studentDTO.getEmergencyContactName())
                 .emergencyContactPhone(studentDTO.getEmergencyContactPhone())
                 .emergencyContactRelationship(studentDTO.getEmergencyContactRelationship())
@@ -97,7 +96,6 @@ public class StudentService {
                     existingStudent.setParentPhone(studentDTO.getParentPhone());
                     existingStudent.setParentEmail(studentDTO.getParentEmail());
                     existingStudent.setAddress(studentDTO.getAddress());
-                    existingStudent.setEnrollmentDate(studentDTO.getEnrollmentDate());
                     existingStudent.setEmergencyContactName(studentDTO.getEmergencyContactName());
                     existingStudent.setEmergencyContactPhone(studentDTO.getEmergencyContactPhone());
                     existingStudent.setEmergencyContactRelationship(studentDTO.getEmergencyContactRelationship());
@@ -131,7 +129,6 @@ public class StudentService {
                     existingStudent.setParentPhone(studentDTO.getParentPhone());
                     existingStudent.setParentEmail(studentDTO.getParentEmail());
                     existingStudent.setAddress(studentDTO.getAddress());
-                    existingStudent.setEnrollmentDate(studentDTO.getEnrollmentDate());
                     existingStudent.setEmergencyContactName(studentDTO.getEmergencyContactName());
                     existingStudent.setEmergencyContactPhone(studentDTO.getEmergencyContactPhone());
                     existingStudent.setEmergencyContactRelationship(studentDTO.getEmergencyContactRelationship());
