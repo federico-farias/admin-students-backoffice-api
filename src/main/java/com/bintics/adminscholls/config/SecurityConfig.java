@@ -29,12 +29,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .httpBasic(httpBasic -> {});
-        
+                .anyRequest().permitAll() // Deshabilita la seguridad temporalmente
+            );
         return http.build();
     }
 

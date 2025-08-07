@@ -1,0 +1,427 @@
+openapi: 3.0.3
+info:
+  title: Escuela Lucía Admin API
+  description: API REST para la gestión escolar de estudiantes, grupos, pagos y paquetes de desayuno.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8081/api
+    description: Servidor local de desarrollo
+security:
+  - basicAuth: []
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        groupId:
+          type: integer
+        isActive:
+          type: boolean
+    Group:
+      type: object
+      properties:
+        id:
+          type: integer
+        academicLevel:
+          type: string
+          enum: [MATERNAL, PREESCOLAR, PRIMARIA, SECUNDARIA]
+        grade:
+          type: string
+        name:
+          type: string
+        maxStudents:
+          type: integer
+        isActive:
+          type: boolean
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        amount:
+          type: number
+          format: float
+        paymentMethod:
+          type: string
+          enum: [EFECTIVO, TRANSFERENCIA, TARJETA]
+        paymentStatus:
+          type: string
+          enum: [PENDIENTE, PAGADO, VENCIDO]
+        periodType:
+          type: string
+          enum: [DIARIO, SEMANAL, MENSUAL]
+        dueDate:
+          type: string
+          format: date
+        paidAt:
+          type: string
+          format: date-time
+    BreakfastPackage:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+          format: float
+        periodType:
+          type: string
+          enum: [DIARIO, SEMANAL, MENSUAL]
+    DashboardStats:
+      type: object
+      properties:
+        totalStudents:
+          type: integer
+        totalGroups:
+          type: integer
+        totalPayments:
+          type: integer
+        totalPendingPayments:
+          type: integer
+paths:
+  /students:
+    get:
+      summary: Listar estudiantes
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Lista de estudiantes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+    post:
+      summary: Crear estudiante
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+      responses:
+        '201':
+          description: Estudiante creado
+  /students/{id}:
+    get:
+      summary: Obtener estudiante por ID
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Estudiante encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '404':
+          description: No encontrado
+    put:
+      summary: Actualizar estudiante
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+      responses:
+        '200':
+          description: Estudiante actualizado
+    delete:
+      summary: Eliminar estudiante
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Eliminado
+  /groups:
+    get:
+      summary: Listar grupos
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Lista de grupos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+    post:
+      summary: Crear grupo
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '201':
+          description: Grupo creado
+  /groups/{id}:
+    get:
+      summary: Obtener grupo por ID
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Grupo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '404':
+          description: No encontrado
+    put:
+      summary: Actualizar grupo
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '200':
+          description: Grupo actualizado
+    delete:
+      summary: Eliminar grupo
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Eliminado
+  /payments:
+    get:
+      summary: Listar pagos
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Lista de pagos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+    post:
+      summary: Crear pago
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        '201':
+          description: Pago creado
+  /payments/{id}:
+    get:
+      summary: Obtener pago por ID
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Pago encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: No encontrado
+    put:
+      summary: Actualizar pago
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        '200':
+          description: Pago actualizado
+    delete:
+      summary: Eliminar pago
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Eliminado
+  /breakfast-packages:
+    get:
+      summary: Listar paquetes de desayuno
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Lista de paquetes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BreakfastPackage'
+    post:
+      summary: Crear paquete de desayuno
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BreakfastPackage'
+      responses:
+        '201':
+          description: Paquete creado
+  /breakfast-packages/{id}:
+    get:
+      summary: Obtener paquete de desayuno por ID
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Paquete encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BreakfastPackage'
+        '404':
+          description: No encontrado
+    put:
+      summary: Actualizar paquete de desayuno
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BreakfastPackage'
+      responses:
+        '200':
+          description: Paquete actualizado
+    delete:
+      summary: Eliminar paquete de desayuno
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Eliminado
+  /dashboard:
+    get:
+      summary: Obtener estadísticas del dashboard
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Estadísticas del dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStats'
+

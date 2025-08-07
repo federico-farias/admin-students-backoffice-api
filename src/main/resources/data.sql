@@ -1,7 +1,7 @@
 -- Script de inicialización de datos para Escuela Lucía
 -- Ejecutar después de crear la base de datos
 
-USE escuela_lucia_db;
+USE admin_students;
 
 -- Insertar grupos
 INSERT INTO school_groups (academic_level, grade, name, max_students, is_active, created_at, updated_at) VALUES
