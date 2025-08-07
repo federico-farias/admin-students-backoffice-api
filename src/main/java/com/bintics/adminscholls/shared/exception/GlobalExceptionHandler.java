@@ -88,7 +88,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Errores de validación")
                 .message("Los datos proporcionados no son válidos")
-                .path("/api/students")
                 .details(errors)
                 .build();
 
@@ -97,6 +96,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
+        // Manejar errores específicos de tutores
+        if (ex.getMessage().contains("No se encontró el estudiante con publicId:")) {
+            ErrorResponse error = ErrorResponse.builder()
+                    .timestamp(LocalDateTime.now())
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .error("Estudiante no encontrado")
+                    .message(ex.getMessage())
+                    .path("/api/tutors")
+                    .build();
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

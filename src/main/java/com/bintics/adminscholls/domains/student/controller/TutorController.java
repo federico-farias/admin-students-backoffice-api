@@ -1,11 +1,14 @@
 package com.bintics.adminscholls.domains.student.controller;
 
+import com.bintics.adminscholls.domains.student.dto.CreateTutorDTO;
 import com.bintics.adminscholls.domains.student.dto.TutorDTO;
 import com.bintics.adminscholls.domains.student.service.TutorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +21,17 @@ import java.util.List;
 public class TutorController {
 
     private final TutorService tutorService;
+
+    /**
+     * Crea un nuevo tutor y opcionalmente lo relaciona con un estudiante
+     * @param createTutorDTO Datos del tutor a crear
+     * @return TutorDTO del tutor creado
+     */
+    @PostMapping
+    public ResponseEntity<TutorDTO> createTutor(@Valid @RequestBody CreateTutorDTO createTutorDTO) {
+        TutorDTO createdTutor = tutorService.createTutor(createTutorDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTutor);
+    }
 
     /**
      * Busca tutores por texto combinando firstName + lastName, phone o email

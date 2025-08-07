@@ -1,7 +1,12 @@
 package com.bintics.adminscholls.domains.student.service;
 
+import com.bintics.adminscholls.domains.student.dto.CreateTutorDTO;
 import com.bintics.adminscholls.domains.student.dto.TutorDTO;
+import com.bintics.adminscholls.domains.student.model.Tutor;
+import com.bintics.adminscholls.domains.student.model.StudentTutor;
 import com.bintics.adminscholls.domains.student.repository.TutorRepository;
+import com.bintics.adminscholls.domains.student.repository.StudentRepository;
+import com.bintics.adminscholls.domains.student.repository.StudentTutorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +22,8 @@ import java.util.Optional;
 public class TutorService {
 
     private final TutorRepository tutorRepository;
+    private final StudentRepository studentRepository;
+    private final StudentTutorRepository studentTutorRepository;
 
     /**
      * Busca tutores por texto en nombre completo, teléfono o email
@@ -70,5 +77,47 @@ public class TutorService {
                 .stream()
                 .map(TutorDTO::new)
                 .toList();
+    }
+
+    /**
+     * Crea un nuevo tutor y opcionalmente lo relaciona con un estudiante
+     * @param createTutorDTO Datos del tutor a crear
+     * @return TutorDTO del tutor creado
+     * @throws RuntimeException si el estudiante no existe cuando se proporciona studentPublicId
+     */
+    @Transactional
+    public TutorDTO createTutor(CreateTutorDTO createTutorDTO) {
+        // 1. Validar que el estudiante existe si se proporciona studentPublicId
+        if (createTutorDTO.getStudentPublicId() != null && !createTutorDTO.getStudentPublicId().trim().isEmpty()) {
+            boolean studentExists = studentRepository.findByPublicId(createTutorDTO.getStudentPublicId().trim()).isPresent();
+            if (!studentExists) {
+                throw new RuntimeException("No se encontró el estudiante con publicId: " + createTutorDTO.getStudentPublicId());
+            }
+        }
+
+        // 2. Crear el tutor
+        Tutor tutor = new Tutor(
+                createTutorDTO.getFirstName(),
+                createTutorDTO.getLastName(),
+                createTutorDTO.getEmail(),
+                createTutorDTO.getPhone(),
+                createTutorDTO.getAddress(),
+                createTutorDTO.getRelationship(),
+                createTutorDTO.getOccupation()
+        );
+
+        Tutor savedTutor = tutorRepository.save(tutor);
+
+        // 3. Si se proporcionó studentPublicId, crear la relación
+        if (createTutorDTO.getStudentPublicId() != null && !createTutorDTO.getStudentPublicId().trim().isEmpty()) {
+            StudentTutor studentTutor = new StudentTutor(
+                    createTutorDTO.getStudentPublicId().trim(),
+                    savedTutor.getPublicId(),
+                    false // No es tutor primario por defecto
+            );
+            studentTutorRepository.save(studentTutor);
+        }
+
+        return new TutorDTO(savedTutor);
     }
 }
