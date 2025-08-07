@@ -1,9 +1,15 @@
 package com.bintics.adminscholls.controller;
 
 import com.bintics.adminscholls.dto.GroupDTO;
+import com.bintics.adminscholls.model.AcademicLevel;
 import com.bintics.adminscholls.service.GroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,18 +25,36 @@ public class GroupController {
     private final GroupService groupService;
 
     @GetMapping
-    public ResponseEntity<List<GroupDTO>> getAllGroups(
+    public ResponseEntity<Page<GroupDTO>> getAllGroups(
             @RequestParam(defaultValue = "false") boolean activeOnly,
-            @RequestParam(defaultValue = "false") boolean availableOnly) {
-        List<GroupDTO> groups;
+            @RequestParam(defaultValue = "false") boolean availableOnly,
+            @RequestParam(required = false) String searchText,
+            @RequestParam(required = false) AcademicLevel academicLevel,
+            @RequestParam(required = false) String grade,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String academicYear,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(defaultValue = "false") boolean unpaginated) {
 
-        if (availableOnly) {
-            groups = groupService.getAvailableGroups();
-        } else if (activeOnly) {
-            groups = groupService.getActiveGroups();
-        } else {
-            groups = groupService.getAllGroups();
-        }
+        // Configurar ordenamiento y paginación
+        Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        // Para unpaginated, usar un tamaño muy grande
+        int pageSize = unpaginated ? Integer.MAX_VALUE : size;
+        Pageable pageable = PageRequest.of(page, pageSize, sort);
+
+        // Determinar el filtro de estado activo
+        Boolean activeFilter = isActive != null ? isActive : (activeOnly ? true : null);
+
+        // Usar el método unificado para todos los casos
+        Page<GroupDTO> groups = groupService.findGroups(
+                academicLevel, grade, name, academicYear, activeFilter, availableOnly, searchText, pageable);
 
         return ResponseEntity.ok(groups);
     }

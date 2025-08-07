@@ -1,13 +1,15 @@
 package com.bintics.adminscholls.service;
 
 import com.bintics.adminscholls.dto.GroupDTO;
+import com.bintics.adminscholls.model.AcademicLevel;
 import com.bintics.adminscholls.model.Group;
 import com.bintics.adminscholls.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,18 +19,18 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
 
-    public List<GroupDTO> getAllGroups() {
-        return groupRepository.findAll()
-                .stream()
-                .map(GroupDTO::new)
-                .toList();
-    }
-
-    public List<GroupDTO> getActiveGroups() {
-        return groupRepository.findByIsActiveTrue()
-                .stream()
-                .map(GroupDTO::new)
-                .toList();
+    // Método unificado para todos los casos de búsqueda y filtrado
+    public Page<GroupDTO> findGroups(AcademicLevel academicLevel,
+                                   String grade,
+                                   String name,
+                                   String academicYear,
+                                   Boolean isActive,
+                                   boolean availableOnly,
+                                   String searchText,
+                                   Pageable pageable) {
+        return groupRepository.findGroupsWithAllFilters(
+                academicLevel, grade, name, academicYear, isActive, availableOnly, searchText, pageable)
+                .map(GroupDTO::new);
     }
 
     public Optional<GroupDTO> getGroupById(Long id) {
@@ -82,13 +84,5 @@ public class GroupService {
 
     public Double getAverageOccupancy() {
         return groupRepository.getAverageOccupancyPercentage();
-    }
-
-    public List<GroupDTO> getAvailableGroups() {
-        return groupRepository.findByIsActiveTrue()
-                .stream()
-                .filter(Group::hasAvailableSlots)
-                .map(GroupDTO::new)
-                .toList();
     }
 }
