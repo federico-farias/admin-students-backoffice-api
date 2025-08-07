@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @ComponentScan(basePackages = "com.bintics.adminscholls.domains.group.src")
-@EntityScan(basePackages = "com.bintics.adminscholls.domains.group.src.model")
-@EnableJpaRepositories(basePackages = "com.bintics.adminscholls.domains.group.src.repository")
+@EntityScan(basePackages = "com.bintics.adminscholls.domains.group.model")
+@EnableJpaRepositories(basePackages = "com.bintics.adminscholls.domains.group.repository")
 public class GroupDomainConfig {
 
     // Esta configuración permite que el dominio Group tenga su propio contexto

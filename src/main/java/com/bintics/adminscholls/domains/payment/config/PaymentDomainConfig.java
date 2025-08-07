@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @ComponentScan(basePackages = "com.bintics.adminscholls.domains.payment.src")
-@EntityScan(basePackages = "com.bintics.adminscholls.domains.payment.src.model")
-@EnableJpaRepositories(basePackages = "com.bintics.adminscholls.domains.payment.src.repository")
+@EntityScan(basePackages = "com.bintics.adminscholls.domains.payment.model")
+@EnableJpaRepositories(basePackages = "com.bintics.adminscholls.domains.payment.repository")
 public class PaymentDomainConfig {
 
     // Esta configuración permite que el dominio Payment tenga su propio contexto

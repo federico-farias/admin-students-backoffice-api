@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @ComponentScan(basePackages = "com.bintics.adminscholls.domains.student.src")
-@EntityScan(basePackages = "com.bintics.adminscholls.domains.student.src.model")
-@EnableJpaRepositories(basePackages = "com.bintics.adminscholls.domains.student.src.repository")
+@EntityScan(basePackages = "com.bintics.adminscholls.domains.student.model")
+@EnableJpaRepositories(basePackages = "com.bintics.adminscholls.domains.student.repository")
 public class StudentDomainConfig {
 
     // Esta configuración permite que el dominio Student tenga su propio contexto

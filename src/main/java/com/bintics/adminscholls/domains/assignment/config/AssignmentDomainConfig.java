@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @ComponentScan(basePackages = "com.bintics.adminscholls.domains.assignment.src")
-@EntityScan(basePackages = "com.bintics.adminscholls.domains.assignment.src.model")
-@EnableJpaRepositories(basePackages = "com.bintics.adminscholls.domains.assignment.src.repository")
+@EntityScan(basePackages = "com.bintics.adminscholls.domains.assignment.model")
+@EnableJpaRepositories(basePackages = "com.bintics.adminscholls.domains.assignment.repository")
 public class AssignmentDomainConfig {
 
     // Esta configuración permite que el dominio Assignment tenga su propio contexto

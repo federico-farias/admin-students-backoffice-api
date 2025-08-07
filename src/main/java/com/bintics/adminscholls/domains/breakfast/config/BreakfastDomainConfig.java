@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @ComponentScan(basePackages = "com.bintics.adminscholls.domains.breakfast.src")
-@EntityScan(basePackages = "com.bintics.adminscholls.domains.breakfast.src.model")
-@EnableJpaRepositories(basePackages = "com.bintics.adminscholls.domains.breakfast.src.repository")
+@EntityScan(basePackages = "com.bintics.adminscholls.domains.breakfast.model")
+@EnableJpaRepositories(basePackages = "com.bintics.adminscholls.domains.breakfast.repository")
 public class BreakfastDomainConfig {
 
     // Esta configuración permite que el dominio Breakfast tenga su propio contexto
