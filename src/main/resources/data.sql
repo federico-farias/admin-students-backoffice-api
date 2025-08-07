@@ -61,6 +61,22 @@ VALUES
     (UUID(), 'Elena', 'Morales', 'Tía', '555-0109', 'elena.morales@email.com', 'Residencial Norte 369', true, NOW(), NOW()),
     (UUID(), 'Miguel', 'Vargas', 'Abuelo', '555-0110', 'miguel.vargas@email.com', 'Urbanización Sur 741', true, NOW(), NOW());
 
+-- Insertar tutores de prueba
+INSERT INTO tutors (public_id, first_name, last_name, email, phone, address, relationship, occupation, is_active, created_at, updated_at)
+VALUES
+    (UUID(), 'Andrea', 'Pérez', 'andrea.perez@email.com', '555-1001', 'Av. Libertad 100', 'Madre', 'Doctora', true, NOW(), NOW()),
+    (UUID(), 'Roberto', 'García', 'roberto.garcia@email.com', '555-1002', 'Calle Mayor 200', 'Padre', 'Ingeniero', true, NOW(), NOW()),
+    (UUID(), 'Carmen', 'López', 'carmen.lopez@email.com', '555-1003', 'Plaza Norte 300', 'Madre', 'Profesora', true, NOW(), NOW()),
+    (UUID(), 'Diego', 'Martínez', 'diego.martinez@email.com', '555-1004', 'Bulevar Sur 400', 'Padre', 'Abogado', true, NOW(), NOW()),
+    (UUID(), 'Sofía', 'Rodríguez', 'sofia.rodriguez@email.com', '555-1005', 'Av. Central 500', 'Madre', 'Enfermera', true, NOW(), NOW()),
+    (UUID(), 'Fernando', 'Silva', 'fernando.silva@email.com', '555-1006', 'Calle Este 600', 'Padre', 'Arquitecto', true, NOW(), NOW()),
+    (UUID(), 'Mónica', 'Torres', 'monica.torres@email.com', '555-1007', 'Plaza Oeste 700', 'Madre', 'Psicóloga', true, NOW(), NOW()),
+    (UUID(), 'Alejandro', 'Morales', 'alejandro.morales@email.com', '555-1008', 'Diagonal 800', 'Padre', 'Contador', true, NOW(), NOW()),
+    (UUID(), 'Beatriz', 'Hernández', 'beatriz.hernandez@email.com', '555-1009', 'Ronda 900', 'Madre', 'Administradora', true, NOW(), NOW()),
+    (UUID(), 'Ricardo', 'Castro', 'ricardo.castro@email.com', '555-1010', 'Circuito 1000', 'Padre', 'Empresario', true, NOW(), NOW()),
+    (UUID(), 'Laura', 'Díaz', 'laura.diaz@email.com', '555-1011', 'Pasaje 1100', 'Tutora Legal', 'Trabajadora Social', true, NOW(), NOW()),
+    (UUID(), 'Miguel', 'Vargas', 'miguel.vargas@email.com', '555-1012', 'Sector 1200', 'Tutor Legal', 'Pedagogo', true, NOW(), NOW());
+
 -- Insertar grupos de ejemplo
 INSERT INTO `groups` (group_code, academic_year, academic_level, grade, name, max_students, is_active, created_at, updated_at)
 VALUES

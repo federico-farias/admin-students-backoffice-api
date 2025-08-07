@@ -42,6 +42,10 @@ public class StudentDTO {
     @NotEmpty(message = "Debe proporcionar al menos un contacto de emergencia")
     private List<String> emergencyContactIds;
 
+    // Lista de publicId de tutores
+    @NotEmpty(message = "Debe proporcionar al menos un tutor")
+    private List<String> tutorIds;
+
     private Boolean isActive;
 
     // Constructor para crear desde entidad
@@ -55,12 +59,13 @@ public class StudentDTO {
         this.dateOfBirth = student.getDateOfBirth();
         this.address = student.getAddress();
         this.isActive = student.getIsActive();
-        // Los contactos de emergencia se cargarán por separado si es necesario
+        // Los contactos de emergencia y tutores se cargarán por separado si es necesario
     }
 
     // Constructor para creación (sin publicId)
     public StudentDTO(String firstName, String lastName, String email, String phone,
-                     LocalDate dateOfBirth, String address, List<String> emergencyContactIds) {
+                     LocalDate dateOfBirth, String address, List<String> emergencyContactIds,
+                     List<String> tutorIds) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -68,6 +73,7 @@ public class StudentDTO {
         this.dateOfBirth = dateOfBirth;
         this.address = address;
         this.emergencyContactIds = emergencyContactIds;
+        this.tutorIds = tutorIds;
     }
 
     // Utility methods

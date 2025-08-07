@@ -2,6 +2,8 @@ package com.bintics.adminscholls.shared.exception;
 
 import com.bintics.adminscholls.domains.student.exception.EmergencyContactsNotFoundException;
 import com.bintics.adminscholls.domains.student.exception.StudentAlreadyExistsException;
+import com.bintics.adminscholls.domains.student.exception.TutorsNotFoundException;
+import com.bintics.adminscholls.domains.student.exception.NoTutorsProvidedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -39,6 +41,33 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .path("/api/students")
                 .details(Map.of("notFoundContactIds", ex.getNotFoundContactIds()))
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(TutorsNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleTutorsNotFound(TutorsNotFoundException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Tutores no encontrados")
+                .message(ex.getMessage())
+                .path("/api/students")
+                .details(Map.of("notFoundTutorIds", ex.getNotFoundTutorIds()))
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(NoTutorsProvidedException.class)
+    public ResponseEntity<ErrorResponse> handleNoTutorsProvided(NoTutorsProvidedException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Tutores requeridos")
+                .message(ex.getMessage())
+                .path("/api/students")
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);

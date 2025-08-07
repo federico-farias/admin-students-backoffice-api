@@ -1,11 +1,16 @@
 package com.bintics.adminscholls.domains.student.service;
 
 import com.bintics.adminscholls.domains.student.repository.EmergencyContactRepository;
+import com.bintics.adminscholls.domains.student.repository.TutorRepository;
+import com.bintics.adminscholls.domains.student.repository.StudentTutorRepository;
 import com.bintics.adminscholls.domains.student.dto.StudentDTO;
 import com.bintics.adminscholls.domains.student.exception.EmergencyContactsNotFoundException;
 import com.bintics.adminscholls.domains.student.exception.StudentAlreadyExistsException;
+import com.bintics.adminscholls.domains.student.exception.TutorsNotFoundException;
+import com.bintics.adminscholls.domains.student.exception.NoTutorsProvidedException;
 import com.bintics.adminscholls.domains.student.model.Student;
 import com.bintics.adminscholls.domains.student.model.StudentEmergencyContact;
+import com.bintics.adminscholls.domains.student.model.StudentTutor;
 import com.bintics.adminscholls.domains.student.repository.StudentEmergencyContactRepository;
 import com.bintics.adminscholls.domains.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +30,8 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final EmergencyContactRepository emergencyContactRepository;
     private final StudentEmergencyContactRepository studentEmergencyContactRepository;
+    private final TutorRepository tutorRepository;
+    private final StudentTutorRepository studentTutorRepository;
 
     public List<StudentDTO> getAllStudents() {
         return studentRepository.findAll()
@@ -62,7 +69,10 @@ public class StudentService {
         // 2. Validar que todos los contactos de emergencia existan
         validateEmergencyContactsExist(studentDTO.getEmergencyContactIds());
 
-        // 3. Crear el estudiante
+        // 3. Validar que todos los tutores existan
+        validateTutorsExist(studentDTO.getTutorIds());
+
+        // 4. Crear el estudiante
         Student student = new Student(
                 studentDTO.getFirstName(),
                 studentDTO.getLastName(),
@@ -74,8 +84,11 @@ public class StudentService {
 
         Student savedStudent = studentRepository.save(student);
 
-        // 4. Asociar los contactos de emergencia
+        // 5. Asociar los contactos de emergencia
         associateEmergencyContacts(savedStudent.getPublicId(), studentDTO.getEmergencyContactIds());
+
+        // 6. Asociar los tutores
+        associateTutors(savedStudent.getPublicId(), studentDTO.getTutorIds());
 
         return new StudentDTO(savedStudent);
     }
@@ -122,6 +135,29 @@ public class StudentService {
         for (String contactId : emergencyContactIds) {
             StudentEmergencyContact association = new StudentEmergencyContact(studentPublicId, contactId);
             studentEmergencyContactRepository.save(association);
+        }
+    }
+
+    private void validateTutorsExist(List<String> tutorIds) {
+        if (tutorIds == null || tutorIds.isEmpty()) {
+            throw new NoTutorsProvidedException();
+        }
+
+        List<String> existingTutorIds = tutorRepository.findExistingPublicIds(tutorIds);
+
+        List<String> notFoundTutorIds = tutorIds.stream()
+                .filter(id -> !existingTutorIds.contains(id))
+                .toList();
+
+        if (!notFoundTutorIds.isEmpty()) {
+            throw new TutorsNotFoundException(notFoundTutorIds);
+        }
+    }
+
+    private void associateTutors(String studentPublicId, List<String> tutorIds) {
+        for (String tutorId : tutorIds) {
+            StudentTutor association = new StudentTutor(studentPublicId, tutorId, false);
+            studentTutorRepository.save(association);
         }
     }
 
