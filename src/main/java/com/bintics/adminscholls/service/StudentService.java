@@ -46,6 +46,11 @@ public class StudentService {
                 .map(StudentDTO::new);
     }
 
+    public Optional<StudentDTO> getStudentByPublicId(String publicId) {
+        return studentRepository.findByPublicId(publicId)
+                .map(StudentDTO::new);
+    }
+
     public StudentDTO createStudent(StudentDTO studentDTO) {
         Student student = Student.builder()
                 .firstName(studentDTO.getFirstName())
@@ -112,8 +117,58 @@ public class StudentService {
                 });
     }
 
+    public Optional<StudentDTO> updateStudentByPublicId(String publicId, StudentDTO studentDTO) {
+        return studentRepository.findByPublicId(publicId)
+                .map(existingStudent -> {
+                    existingStudent.setFirstName(studentDTO.getFirstName());
+                    existingStudent.setLastName(studentDTO.getLastName());
+                    existingStudent.setEmail(studentDTO.getEmail());
+                    existingStudent.setPhone(studentDTO.getPhone());
+                    existingStudent.setDateOfBirth(studentDTO.getDateOfBirth());
+                    existingStudent.setGrade(studentDTO.getGrade());
+                    existingStudent.setSection(studentDTO.getSection());
+                    existingStudent.setParentName(studentDTO.getParentName());
+                    existingStudent.setParentPhone(studentDTO.getParentPhone());
+                    existingStudent.setParentEmail(studentDTO.getParentEmail());
+                    existingStudent.setAddress(studentDTO.getAddress());
+                    existingStudent.setEnrollmentDate(studentDTO.getEnrollmentDate());
+                    existingStudent.setEmergencyContactName(studentDTO.getEmergencyContactName());
+                    existingStudent.setEmergencyContactPhone(studentDTO.getEmergencyContactPhone());
+                    existingStudent.setEmergencyContactRelationship(studentDTO.getEmergencyContactRelationship());
+
+                    // Actualizar grupo si ha cambiado
+                    if (studentDTO.getGroupId() != null &&
+                        !studentDTO.getGroupId().equals(existingStudent.getGroup() != null ?
+                        existingStudent.getGroup().getId() : null)) {
+                        Optional<Group> newGroup = groupRepository.findById(studentDTO.getGroupId());
+                        if (newGroup.isPresent() && newGroup.get().hasAvailableSpaces()) {
+                            existingStudent.setGroup(newGroup.get());
+                        }
+                    }
+
+                    Student savedStudent = studentRepository.save(existingStudent);
+                    return new StudentDTO(savedStudent);
+                });
+    }
+
     public boolean assignToGroup(Long studentId, Long groupId) {
         Optional<Student> studentOpt = studentRepository.findById(studentId);
+        Optional<Group> groupOpt = groupRepository.findById(groupId);
+
+        if (studentOpt.isPresent() && groupOpt.isPresent()) {
+            Group group = groupOpt.get();
+            if (group.hasAvailableSpaces()) {
+                Student student = studentOpt.get();
+                student.setGroup(group);
+                studentRepository.save(student);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean assignToGroupByPublicId(String publicId, Long groupId) {
+        Optional<Student> studentOpt = studentRepository.findByPublicId(publicId);
         Optional<Group> groupOpt = groupRepository.findById(groupId);
 
         if (studentOpt.isPresent() && groupOpt.isPresent()) {
@@ -136,8 +191,21 @@ public class StudentService {
                 });
     }
 
+    public void deactivateStudentByPublicId(String publicId) {
+        studentRepository.findByPublicId(publicId)
+                .ifPresent(student -> {
+                    student.setIsActive(false);
+                    studentRepository.save(student);
+                });
+    }
+
     public void deleteStudent(Long id) {
         studentRepository.deleteById(id);
+    }
+
+    public void deleteStudentByPublicId(String publicId) {
+        studentRepository.findByPublicId(publicId)
+                .ifPresent(student -> studentRepository.delete(student));
     }
 
     public List<StudentDTO> getStudentsByGroup(Long groupId) {

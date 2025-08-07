@@ -41,8 +41,8 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long id) {
-        return studentService.getStudentById(id)
+    public ResponseEntity<StudentDTO> getStudentById(@PathVariable String id) {
+        return studentService.getStudentByPublicId(id)
                 .map(student -> ResponseEntity.ok(student))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -65,32 +65,32 @@ public class StudentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<StudentDTO> updateStudent(
-            @PathVariable Long id,
+            @PathVariable String id,
             @Valid @RequestBody StudentDTO studentDTO) {
-        return studentService.updateStudent(id, studentDTO)
+        return studentService.updateStudentByPublicId(id, studentDTO)
                 .map(student -> ResponseEntity.ok(student))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}/assign-group")
     public ResponseEntity<Void> assignToGroup(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam Long groupId) {
-        boolean assigned = studentService.assignToGroup(id, groupId);
+        boolean assigned = studentService.assignToGroupByPublicId(id, groupId);
         return assigned ?
                 ResponseEntity.ok().build() :
                 ResponseEntity.badRequest().build();
     }
 
     @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateStudent(@PathVariable Long id) {
-        studentService.deactivateStudent(id);
+    public ResponseEntity<Void> deactivateStudent(@PathVariable String id) {
+        studentService.deactivateStudentByPublicId(id);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
-        studentService.deleteStudent(id);
+    public ResponseEntity<Void> deleteStudent(@PathVariable String id) {
+        studentService.deleteStudentByPublicId(id);
         return ResponseEntity.noContent().build();
     }
 

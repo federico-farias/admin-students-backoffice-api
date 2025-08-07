@@ -14,6 +14,8 @@ public class StudentDTO {
 
     private Long id;
 
+    private String publicId;
+
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 100)
     private String firstName;
@@ -77,6 +79,7 @@ public class StudentDTO {
     // Constructor para convertir desde entidad
     public StudentDTO(Student student) {
         this.id = student.getId();
+        this.publicId = student.getPublicId();
         this.firstName = student.getFirstName();
         this.lastName = student.getLastName();
         this.email = student.getEmail();

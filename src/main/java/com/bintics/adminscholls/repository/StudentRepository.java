@@ -16,6 +16,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     List<Student> findByIsActiveTrue();
 
+    Optional<Student> findByPublicId(String publicId);
+
     List<Student> findByGradeAndSection(String grade, String section);
 
     @Query("SELECT s FROM Student s WHERE s.isActive = true AND " +
