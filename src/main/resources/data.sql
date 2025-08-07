@@ -4,17 +4,17 @@
 USE admin_students;
 
 -- Insertar grupos
-INSERT INTO school_groups (academic_level, grade, name, max_students, is_active, created_at, updated_at) VALUES
-('MATERNAL', 'Primero', 'A', 10, true, NOW(), NOW()),
-('MATERNAL', 'Segundo', 'A', 10, true, NOW(), NOW()),
-('PREESCOLAR', 'Primero', 'A', 15, true, NOW(), NOW()),
-('PREESCOLAR', 'Segundo', 'A', 15, true, NOW(), NOW()),
-('PRIMARIA', 'Primero', 'A', 25, true, NOW(), NOW()),
-('PRIMARIA', 'Primero', 'B', 25, true, NOW(), NOW()),
-('PRIMARIA', 'Segundo', 'A', 25, true, NOW(), NOW()),
-('PRIMARIA', 'Tercero', 'A', 25, true, NOW(), NOW()),
-('SECUNDARIA', 'Primero', 'A', 30, true, NOW(), NOW()),
-('SECUNDARIA', 'Segundo', 'A', 30, true, NOW(), NOW());
+INSERT INTO school_groups (academic_level, grade, name, academic_year, max_students, is_active, created_at, updated_at) VALUES
+('MATERNAL', 'Primero', 'A', '2024-2025', 10, true, NOW(), NOW()),
+('MATERNAL', 'Segundo', 'A', '2024-2025', 10, true, NOW(), NOW()),
+('PREESCOLAR', 'Primero', 'A', '2024-2025', 15, true, NOW(), NOW()),
+('PREESCOLAR', 'Segundo', 'A', '2024-2025', 15, true, NOW(), NOW()),
+('PRIMARIA', 'Primero', 'A', '2024-2025', 25, true, NOW(), NOW()),
+('PRIMARIA', 'Primero', 'B', '2024-2025', 25, true, NOW(), NOW()),
+('PRIMARIA', 'Segundo', 'A', '2024-2025', 25, true, NOW(), NOW()),
+('PRIMARIA', 'Tercero', 'A', '2024-2025', 25, true, NOW(), NOW()),
+('SECUNDARIA', 'Primero', 'A', '2024-2025', 30, true, NOW(), NOW()),
+('SECUNDARIA', 'Segundo', 'A', '2024-2025', 30, true, NOW(), NOW());
 
 -- Insertar paquetes de desayuno
 INSERT INTO breakfast_packages (name, description, price_per_day, price_per_week, price_per_month, is_active, created_at, updated_at) VALUES

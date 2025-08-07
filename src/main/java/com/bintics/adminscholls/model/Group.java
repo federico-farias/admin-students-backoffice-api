@@ -38,6 +38,11 @@ public class Group {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @NotBlank(message = "El ciclo escolar es obligatorio")
+    @Size(max = 20, message = "El ciclo escolar no puede exceder 20 caracteres")
+    @Column(name = "academic_year", nullable = false)
+    private String academicYear;
+
     @NotNull(message = "El máximo de estudiantes es obligatorio")
     @Min(value = 1, message = "El máximo de estudiantes debe ser mayor a 0")
     @Max(value = 50, message = "El máximo de estudiantes no puede ser mayor a 50")
@@ -61,10 +66,11 @@ public class Group {
     private LocalDateTime updatedAt;
 
     // Constructor personalizado para casos comunes
-    public Group(AcademicLevel academicLevel, String grade, String name, Integer maxStudents) {
+    public Group(AcademicLevel academicLevel, String grade, String name, String academicYear, Integer maxStudents) {
         this.academicLevel = academicLevel;
         this.grade = grade;
         this.name = name;
+        this.academicYear = academicYear;
         this.maxStudents = maxStudents;
         this.isActive = true;
         this.students = new ArrayList<>();

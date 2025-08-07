@@ -24,6 +24,10 @@ public class GroupDTO {
     @Size(max = 10)
     private String name;
 
+    @NotBlank(message = "El ciclo escolar es obligatorio")
+    @Size(max = 20, message = "El ciclo escolar no puede exceder 20 caracteres")
+    private String academicYear;
+
     @NotNull(message = "El máximo de estudiantes es obligatorio")
     @Min(value = 1, message = "El máximo de estudiantes debe ser mayor a 0")
     @Max(value = 50, message = "El máximo de estudiantes no puede ser mayor a 50")
@@ -38,6 +42,7 @@ public class GroupDTO {
         this.academicLevel = group.getAcademicLevel();
         this.grade = group.getGrade();
         this.name = group.getName();
+        this.academicYear = group.getAcademicYear();
         this.maxStudents = group.getMaxStudents();
         this.studentsCount = group.getStudentsCount();
         this.isActive = group.getIsActive();

@@ -41,6 +41,7 @@ public class GroupService {
                 .academicLevel(groupDTO.getAcademicLevel())
                 .grade(groupDTO.getGrade())
                 .name(groupDTO.getName())
+                .academicYear(groupDTO.getAcademicYear())
                 .maxStudents(groupDTO.getMaxStudents())
                 .isActive(true)
                 .build();
@@ -55,6 +56,7 @@ public class GroupService {
                     existingGroup.setAcademicLevel(groupDTO.getAcademicLevel());
                     existingGroup.setGrade(groupDTO.getGrade());
                     existingGroup.setName(groupDTO.getName());
+                    existingGroup.setAcademicYear(groupDTO.getAcademicYear());
                     existingGroup.setMaxStudents(groupDTO.getMaxStudents());
 
                     Group savedGroup = groupRepository.save(existingGroup);
