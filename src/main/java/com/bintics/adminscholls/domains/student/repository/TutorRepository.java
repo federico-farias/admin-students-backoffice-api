@@ -1,6 +1,8 @@
 package com.bintics.adminscholls.domains.student.repository;
 
 import com.bintics.adminscholls.domains.student.model.Tutor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,9 +23,17 @@ public interface TutorRepository extends JpaRepository<Tutor, Long> {
 
     List<Tutor> findByPublicIdIn(List<String> publicIds);
 
+    // Método de búsqueda combinada con paginación
     @Query("SELECT t FROM Tutor t WHERE t.isActive = true AND " +
-           "(LOWER(t.firstName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(t.lastName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(t.phone) LIKE LOWER(CONCAT('%', :search, '%')))")
-    List<Tutor> findBySearchTerm(@Param("search") String search);
+           "(LOWER(CONCAT(t.firstName, ' ', t.lastName)) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(t.phone) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(t.email) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<Tutor> findBySearchTerm(@Param("search") String search, Pageable pageable);
+
+    // Método para búsqueda sin paginación (útil para validaciones)
+    @Query("SELECT t FROM Tutor t WHERE t.isActive = true AND " +
+           "(LOWER(CONCAT(t.firstName, ' ', t.lastName)) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(t.phone) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(t.email) LIKE LOWER(CONCAT('%', :search, '%')))")
+    List<Tutor> findBySearchTermList(@Param("search") String search);
 }
