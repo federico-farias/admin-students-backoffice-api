@@ -97,10 +97,6 @@ public class Student {
     @Column(name = "emergency_contact_relationship")
     private String emergencyContactRelationship;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
-    private Group group;
-
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -3,10 +3,10 @@ package com.bintics.adminscholls.controller;
 import com.bintics.adminscholls.dto.GroupDTO;
 import com.bintics.adminscholls.model.AcademicLevel;
 import com.bintics.adminscholls.service.GroupService;
+import com.bintics.adminscholls.exception.DuplicateGroupException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/groups")
@@ -67,22 +68,34 @@ public class GroupController {
     }
 
     @PostMapping
-    public ResponseEntity<GroupDTO> createGroup(@Valid @RequestBody GroupDTO groupDTO) {
+    public ResponseEntity<?> createGroup(@Valid @RequestBody GroupDTO groupDTO) {
         try {
             GroupDTO createdGroup = groupService.createGroup(groupDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdGroup);
+        } catch (DuplicateGroupException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "Grupo duplicado", "message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Error al crear grupo", "message", e.getMessage()));
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GroupDTO> updateGroup(
+    public ResponseEntity<?> updateGroup(
             @PathVariable Long id,
             @Valid @RequestBody GroupDTO groupDTO) {
-        return groupService.updateGroup(id, groupDTO)
-                .map(group -> ResponseEntity.ok(group))
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            return groupService.updateGroup(id, groupDTO)
+                    .map(group -> ResponseEntity.ok(group))
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (DuplicateGroupException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "Grupo duplicado", "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Error al actualizar grupo", "message", e.getMessage()));
+        }
     }
 
     @PatchMapping("/{id}/deactivate")

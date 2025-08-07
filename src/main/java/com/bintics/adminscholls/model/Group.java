@@ -7,8 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "school_groups")
@@ -22,6 +21,12 @@ public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
+    private String publicId = UUID.randomUUID().toString();
+
+    @Column(name = "group_code", nullable = false, unique = true, updatable = false)
+    private String groupCode;
 
     @NotNull(message = "El nivel académico es obligatorio")
     @Enumerated(EnumType.STRING)
@@ -50,10 +55,6 @@ public class Group {
     private Integer maxStudents;
 
     @Builder.Default
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Student> students = new ArrayList<>();
-
-    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
@@ -73,24 +74,36 @@ public class Group {
         this.academicYear = academicYear;
         this.maxStudents = maxStudents;
         this.isActive = true;
-        this.students = new ArrayList<>();
     }
 
-    // Utility methods
-    public Integer getStudentsCount() {
-        return students != null ? students.size() : 0;
-    }
-
+    // Utility methods - ahora estos métodos necesitarán ser calculados externamente
+    // ya que no tenemos la relación directa con students
     public String getFullName() {
         return academicLevel + " " + grade + " - " + name;
     }
 
-    public boolean hasAvailableSlots() {
-        return getStudentsCount() < maxStudents;
+    // Método para generar el código del grupo automáticamente
+    public void generateGroupCode() {
+        if (this.groupCode == null && this.academicYear != null &&
+            this.academicLevel != null && this.grade != null && this.name != null) {
+
+            // Formato: {academicYear}-{academicLevel}-{grade}-{name}
+            // Ejemplo: 2024-2025-PRIMARIA-PRIMERO-A
+            this.groupCode = String.format("%s-%s-%s-%s",
+                this.academicYear,
+                this.academicLevel.toString(),
+                this.grade.toUpperCase().replace(" ", ""),
+                this.name.toUpperCase()
+            );
+        }
     }
 
-    // Método para compatibilidad con código existente
-    public boolean hasAvailableSpaces() {
-        return hasAvailableSlots();
+    @PrePersist
+    @PreUpdate
+    public void prePersist() {
+        generateGroupCode();
+        if (this.publicId == null) {
+            this.publicId = UUID.randomUUID().toString();
+        }
     }
 }

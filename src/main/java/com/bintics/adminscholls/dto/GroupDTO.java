@@ -13,6 +13,8 @@ public class GroupDTO {
 
     private Long id;
 
+    private String groupCode;
+
     @NotNull(message = "El nivel académico es obligatorio")
     private AcademicLevel academicLevel;
 
@@ -39,13 +41,20 @@ public class GroupDTO {
     // Constructor para convertir desde entidad
     public GroupDTO(Group group) {
         this.id = group.getId();
+        this.groupCode = group.getGroupCode();
         this.academicLevel = group.getAcademicLevel();
         this.grade = group.getGrade();
         this.name = group.getName();
         this.academicYear = group.getAcademicYear();
         this.maxStudents = group.getMaxStudents();
-        this.studentsCount = group.getStudentsCount();
+        this.studentsCount = 0; // Se calculará externamente usando StudentGroupAssignmentService
         this.isActive = group.getIsActive();
+    }
+
+    // Constructor con studentsCount calculado externamente
+    public GroupDTO(Group group, Integer studentsCount) {
+        this(group);
+        this.studentsCount = studentsCount;
     }
 
     // Utility methods

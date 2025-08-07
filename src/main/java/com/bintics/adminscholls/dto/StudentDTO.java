@@ -92,11 +92,6 @@ public class StudentDTO {
         this.emergencyContactName = student.getEmergencyContactName();
         this.emergencyContactPhone = student.getEmergencyContactPhone();
         this.emergencyContactRelationship = student.getEmergencyContactRelationship();
-
-        if (student.getGroup() != null) {
-            this.groupId = student.getGroup().getId();
-            this.groupName = student.getGroup().getFullName();
-        }
     }
 
     // Utility methods

@@ -70,13 +70,8 @@ public class StudentService {
                 .isActive(true)
                 .build();
 
-        // Asignar grupo si se especifica
-        if (studentDTO.getGroupId() != null) {
-            Optional<Group> group = groupRepository.findById(studentDTO.getGroupId());
-            if (group.isPresent() && group.get().hasAvailableSpaces()) {
-                student.setGroup(group.get());
-            }
-        }
+        // Nota: La asignación a grupos ahora se maneja mediante StudentGroupAssignment
+        // No asignamos directamente el grupo aquí - usar StudentGroupAssignmentService para eso
 
         Student savedStudent = studentRepository.save(student);
         return new StudentDTO(savedStudent);
@@ -100,15 +95,8 @@ public class StudentService {
                     existingStudent.setEmergencyContactPhone(studentDTO.getEmergencyContactPhone());
                     existingStudent.setEmergencyContactRelationship(studentDTO.getEmergencyContactRelationship());
 
-                    // Actualizar grupo si ha cambiado
-                    if (studentDTO.getGroupId() != null &&
-                        !studentDTO.getGroupId().equals(existingStudent.getGroup() != null ?
-                        existingStudent.getGroup().getId() : null)) {
-                        Optional<Group> newGroup = groupRepository.findById(studentDTO.getGroupId());
-                        if (newGroup.isPresent() && newGroup.get().hasAvailableSpaces()) {
-                            existingStudent.setGroup(newGroup.get());
-                        }
-                    }
+                    // Nota: La gestión de grupos ahora se maneja mediante StudentGroupAssignment
+                    // Usar StudentGroupAssignmentService para cambios de grupo
 
                     Student savedStudent = studentRepository.save(existingStudent);
                     return new StudentDTO(savedStudent);
@@ -133,51 +121,25 @@ public class StudentService {
                     existingStudent.setEmergencyContactPhone(studentDTO.getEmergencyContactPhone());
                     existingStudent.setEmergencyContactRelationship(studentDTO.getEmergencyContactRelationship());
 
-                    // Actualizar grupo si ha cambiado
-                    if (studentDTO.getGroupId() != null &&
-                        !studentDTO.getGroupId().equals(existingStudent.getGroup() != null ?
-                        existingStudent.getGroup().getId() : null)) {
-                        Optional<Group> newGroup = groupRepository.findById(studentDTO.getGroupId());
-                        if (newGroup.isPresent() && newGroup.get().hasAvailableSpaces()) {
-                            existingStudent.setGroup(newGroup.get());
-                        }
-                    }
+                    // Nota: La gestión de grupos ahora se maneja mediante StudentGroupAssignment
+                    // Usar StudentGroupAssignmentService para cambios de grupo
 
                     Student savedStudent = studentRepository.save(existingStudent);
                     return new StudentDTO(savedStudent);
                 });
     }
 
+    // DEPRECATED: Estos métodos están obsoletos - usar StudentGroupAssignmentService
+    @Deprecated
     public boolean assignToGroup(Long studentId, Long groupId) {
-        Optional<Student> studentOpt = studentRepository.findById(studentId);
-        Optional<Group> groupOpt = groupRepository.findById(groupId);
-
-        if (studentOpt.isPresent() && groupOpt.isPresent()) {
-            Group group = groupOpt.get();
-            if (group.hasAvailableSpaces()) {
-                Student student = studentOpt.get();
-                student.setGroup(group);
-                studentRepository.save(student);
-                return true;
-            }
-        }
-        return false;
+        // Este método está obsoleto. Usar StudentGroupAssignmentService.createAssignment()
+        throw new UnsupportedOperationException("Usar StudentGroupAssignmentService.createAssignment() en su lugar");
     }
 
+    @Deprecated
     public boolean assignToGroupByPublicId(String publicId, Long groupId) {
-        Optional<Student> studentOpt = studentRepository.findByPublicId(publicId);
-        Optional<Group> groupOpt = groupRepository.findById(groupId);
-
-        if (studentOpt.isPresent() && groupOpt.isPresent()) {
-            Group group = groupOpt.get();
-            if (group.hasAvailableSpaces()) {
-                Student student = studentOpt.get();
-                student.setGroup(group);
-                studentRepository.save(student);
-                return true;
-            }
-        }
-        return false;
+        // Este método está obsoleto. Usar StudentGroupAssignmentService.createAssignment()
+        throw new UnsupportedOperationException("Usar StudentGroupAssignmentService.createAssignment() en su lugar");
     }
 
     public void deactivateStudent(Long id) {
@@ -205,11 +167,10 @@ public class StudentService {
                 .ifPresent(student -> studentRepository.delete(student));
     }
 
+    @Deprecated
     public List<StudentDTO> getStudentsByGroup(Long groupId) {
-        return studentRepository.findByGroupId(groupId)
-                .stream()
-                .map(StudentDTO::new)
-                .toList();
+        // Este método está obsoleto. Usar StudentGroupAssignmentService.getAssignmentsByGroupCode()
+        throw new UnsupportedOperationException("Usar StudentGroupAssignmentService.getAssignmentsByGroupCode() en su lugar");
     }
 
     public Long getActiveStudentsCount() {

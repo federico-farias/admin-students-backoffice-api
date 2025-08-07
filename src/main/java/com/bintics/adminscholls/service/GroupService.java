@@ -1,9 +1,11 @@
 package com.bintics.adminscholls.service;
 
 import com.bintics.adminscholls.dto.GroupDTO;
+import com.bintics.adminscholls.exception.DuplicateGroupException;
 import com.bintics.adminscholls.model.AcademicLevel;
 import com.bintics.adminscholls.model.Group;
 import com.bintics.adminscholls.repository.GroupRepository;
+import com.bintics.adminscholls.repository.StudentGroupAssignmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class GroupService {
 
     private final GroupRepository groupRepository;
+    private final StudentGroupAssignmentRepository assignmentRepository;
 
     // Método unificado para todos los casos de búsqueda y filtrado
     public Page<GroupDTO> findGroups(AcademicLevel academicLevel,
@@ -30,15 +33,36 @@ public class GroupService {
                                    Pageable pageable) {
         return groupRepository.findGroupsWithAllFilters(
                 academicLevel, grade, name, academicYear, isActive, availableOnly, searchText, pageable)
-                .map(GroupDTO::new);
+                .map(this::convertToDTO);
     }
 
     public Optional<GroupDTO> getGroupById(Long id) {
         return groupRepository.findById(id)
-                .map(GroupDTO::new);
+                .map(this::convertToDTO);
+    }
+
+    // Método helper para convertir Group a GroupDTO con studentsCount calculado
+    private GroupDTO convertToDTO(Group group) {
+        Long studentsCount = assignmentRepository.countActiveStudentsInGroup(group.getGroupCode());
+        return new GroupDTO(group, studentsCount.intValue());
     }
 
     public GroupDTO createGroup(GroupDTO groupDTO) {
+        // Validar que no existe un grupo duplicado
+        if (groupRepository.existsDuplicateGroup(
+                groupDTO.getAcademicLevel(),
+                groupDTO.getGrade(),
+                groupDTO.getName(),
+                groupDTO.getAcademicYear(),
+                null)) {
+            throw new DuplicateGroupException(
+                groupDTO.getAcademicLevel().toString(),
+                groupDTO.getGrade(),
+                groupDTO.getName(),
+                groupDTO.getAcademicYear()
+            );
+        }
+
         Group group = Group.builder()
                 .academicLevel(groupDTO.getAcademicLevel())
                 .grade(groupDTO.getGrade())
@@ -49,12 +73,27 @@ public class GroupService {
                 .build();
 
         Group savedGroup = groupRepository.save(group);
-        return new GroupDTO(savedGroup);
+        return convertToDTO(savedGroup);
     }
 
     public Optional<GroupDTO> updateGroup(Long id, GroupDTO groupDTO) {
         return groupRepository.findById(id)
                 .map(existingGroup -> {
+                    // Validar que no existe un grupo duplicado (excluyendo el actual)
+                    if (groupRepository.existsDuplicateGroup(
+                            groupDTO.getAcademicLevel(),
+                            groupDTO.getGrade(),
+                            groupDTO.getName(),
+                            groupDTO.getAcademicYear(),
+                            id)) {
+                        throw new DuplicateGroupException(
+                            groupDTO.getAcademicLevel().toString(),
+                            groupDTO.getGrade(),
+                            groupDTO.getName(),
+                            groupDTO.getAcademicYear()
+                        );
+                    }
+
                     existingGroup.setAcademicLevel(groupDTO.getAcademicLevel());
                     existingGroup.setGrade(groupDTO.getGrade());
                     existingGroup.setName(groupDTO.getName());
@@ -62,7 +101,7 @@ public class GroupService {
                     existingGroup.setMaxStudents(groupDTO.getMaxStudents());
 
                     Group savedGroup = groupRepository.save(existingGroup);
-                    return new GroupDTO(savedGroup);
+                    return convertToDTO(savedGroup);
                 });
     }
 

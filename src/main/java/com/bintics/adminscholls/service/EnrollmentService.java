@@ -73,11 +73,6 @@ public class EnrollmentService {
 
         Group group = groupOpt.get();
 
-        // Verificar que el grupo tenga espacios disponibles
-        if (!group.hasAvailableSpaces()) {
-            throw new RuntimeException("El grupo no tiene espacios disponibles");
-        }
-
         // Crear la inscripción
         Enrollment enrollment = Enrollment.builder()
                 .student(studentOpt.get())
@@ -104,15 +99,6 @@ public class EnrollmentService {
                     existingEnrollment.setEnrollmentFee(enrollmentDTO.getEnrollmentFee());
                     existingEnrollment.setNotes(enrollmentDTO.getNotes());
 
-                    // Actualizar grupo si ha cambiado
-                    if (enrollmentDTO.getGroupId() != null &&
-                        !enrollmentDTO.getGroupId().equals(existingEnrollment.getGroup().getId())) {
-                        Optional<Group> newGroup = groupRepository.findById(enrollmentDTO.getGroupId());
-                        if (newGroup.isPresent() && newGroup.get().hasAvailableSpaces()) {
-                            existingEnrollment.setGroup(newGroup.get());
-                        }
-                    }
-
                     Enrollment savedEnrollment = enrollmentRepository.save(existingEnrollment);
                     return new EnrollmentDTO(savedEnrollment);
                 });
@@ -123,15 +109,6 @@ public class EnrollmentService {
                 .map(enrollment -> {
                     if (enrollment.getStatus() == EnrollmentStatus.PENDIENTE) {
                         enrollment.setStatus(EnrollmentStatus.CONFIRMADA);
-
-                        // Asignar el estudiante al grupo si no está asignado
-                        Student student = enrollment.getStudent();
-                        Group group = enrollment.getGroup();
-                        if (student.getGroup() == null || !student.getGroup().equals(group)) {
-                            student.setGroup(group);
-                            studentRepository.save(student);
-                        }
-
                         enrollmentRepository.save(enrollment);
                         return true;
                     }
