@@ -1,6 +1,8 @@
 package com.bintics.adminscholls.domains.student.repository;
 
 import com.bintics.adminscholls.domains.student.model.EmergencyContact;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,9 +23,17 @@ public interface EmergencyContactRepository extends JpaRepository<EmergencyConta
 
     List<EmergencyContact> findByPublicIdIn(List<String> publicIds);
 
+    // Método de búsqueda combinada con paginación
     @Query("SELECT ec FROM EmergencyContact ec WHERE ec.isActive = true AND " +
-           "(LOWER(ec.firstName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(ec.lastName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(ec.phone) LIKE LOWER(CONCAT('%', :search, '%')))")
-    List<EmergencyContact> findBySearchTerm(@Param("search") String search);
+           "(LOWER(CONCAT(ec.firstName, ' ', ec.lastName)) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(ec.phone) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(ec.email) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<EmergencyContact> findBySearchTerm(@Param("search") String search, Pageable pageable);
+
+    // Método para búsqueda sin paginación (útil para validaciones)
+    @Query("SELECT ec FROM EmergencyContact ec WHERE ec.isActive = true AND " +
+           "(LOWER(CONCAT(ec.firstName, ' ', ec.lastName)) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(ec.phone) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(ec.email) LIKE LOWER(CONCAT('%', :search, '%')))")
+    List<EmergencyContact> findBySearchTermList(@Param("search") String search);
 }
