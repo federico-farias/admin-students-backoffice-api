@@ -4,6 +4,7 @@ import com.bintics.adminscholls.domains.student.exception.EmergencyContactsNotFo
 import com.bintics.adminscholls.domains.student.exception.StudentAlreadyExistsException;
 import com.bintics.adminscholls.domains.student.exception.TutorsNotFoundException;
 import com.bintics.adminscholls.domains.student.exception.NoTutorsProvidedException;
+import com.bintics.adminscholls.domains.student.exception.StudentNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -117,5 +118,17 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    @ExceptionHandler(StudentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleStudentNotFound(StudentNotFoundException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Estudiante no encontrado")
+                .message(ex.getMessage())
+                .path("/api/students")
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 }

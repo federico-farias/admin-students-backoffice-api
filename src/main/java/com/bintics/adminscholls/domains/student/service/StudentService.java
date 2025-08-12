@@ -1,5 +1,6 @@
 package com.bintics.adminscholls.domains.student.service;
 
+import com.bintics.adminscholls.domains.student.model.EmergencyContact;
 import com.bintics.adminscholls.domains.student.repository.EmergencyContactRepository;
 import com.bintics.adminscholls.domains.student.repository.TutorRepository;
 import com.bintics.adminscholls.domains.student.repository.StudentTutorRepository;
@@ -40,16 +41,30 @@ public class StudentService {
                 .toList();
     }
 
-    public List<StudentDTO> getActiveStudents() {
+public List<StudentDTO> getActiveStudents() {
         return studentRepository.findByIsActiveTrue()
                 .stream()
-                .map(StudentDTO::new)
+                .map(this::mapStudentWithContactsAndTutors)
                 .toList();
     }
 
     public Page<StudentDTO> searchStudents(String search, Pageable pageable) {
         return studentRepository.findActiveStudentsBySearch(search, pageable)
-                .map(StudentDTO::new);
+                .map(this::mapStudentWithContactsAndTutors);
+    }
+
+    private StudentDTO mapStudentWithContactsAndTutors(Student s) {
+        var emergencyContactIds = this.studentEmergencyContactRepository.findByStudentPublicId(s.getPublicId()).stream()
+                .map(e -> this.emergencyContactRepository.findByPublicId(e.getEmergencyContactPublicId()))
+                .filter(Optional::isPresent)
+                .map(opt -> opt.get().getPublicId())
+                .toList();
+
+        var tutorIds = this.studentTutorRepository.findByStudentPublicId(s.getPublicId()).stream()
+                .map(StudentTutor::getTutorPublicId)
+                .toList();
+
+        return new StudentDTO(s, emergencyContactIds, tutorIds);
     }
 
     public Optional<StudentDTO> getStudentById(Long id) {

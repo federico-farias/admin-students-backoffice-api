@@ -2,6 +2,7 @@ package com.bintics.adminscholls.domains.student.service;
 
 import com.bintics.adminscholls.domains.student.dto.CreateTutorDTO;
 import com.bintics.adminscholls.domains.student.dto.TutorDTO;
+import com.bintics.adminscholls.domains.student.exception.StudentNotFoundException;
 import com.bintics.adminscholls.domains.student.model.Tutor;
 import com.bintics.adminscholls.domains.student.model.StudentTutor;
 import com.bintics.adminscholls.domains.student.repository.TutorRepository;
@@ -91,7 +92,7 @@ public class TutorService {
         if (createTutorDTO.getStudentPublicId() != null && !createTutorDTO.getStudentPublicId().trim().isEmpty()) {
             boolean studentExists = studentRepository.findByPublicId(createTutorDTO.getStudentPublicId().trim()).isPresent();
             if (!studentExists) {
-                throw new RuntimeException("No se encontró el estudiante con publicId: " + createTutorDTO.getStudentPublicId());
+                throw new StudentNotFoundException("No se encontró el estudiante con publicId: " + createTutorDTO.getStudentPublicId());
             }
         }
 

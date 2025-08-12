@@ -1,15 +1,24 @@
 package com.bintics.adminscholls.domains.student.service;
 
+import com.bintics.adminscholls.domains.student.dto.CreateEmergencyContactDTO;
 import com.bintics.adminscholls.domains.student.dto.EmergencyContactDTO;
+import com.bintics.adminscholls.domains.student.model.EmergencyContact;
+import com.bintics.adminscholls.domains.student.model.Student;
+import com.bintics.adminscholls.domains.student.model.StudentEmergencyContact;
 import com.bintics.adminscholls.domains.student.repository.EmergencyContactRepository;
+import com.bintics.adminscholls.domains.student.repository.StudentEmergencyContactRepository;
+import com.bintics.adminscholls.domains.student.repository.StudentRepository;
+import com.bintics.adminscholls.domains.student.exception.StudentNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +26,8 @@ import java.util.Optional;
 public class EmergencyContactService {
 
     private final EmergencyContactRepository emergencyContactRepository;
+    private final StudentRepository studentRepository;
+    private final StudentEmergencyContactRepository studentEmergencyContactRepository;
 
     /**
      * Busca contactos de emergencia por texto en nombre completo, teléfono o email
@@ -70,5 +81,30 @@ public class EmergencyContactService {
                 .stream()
                 .map(EmergencyContactDTO::new)
                 .toList();
+    }
+
+    /**
+     * Crea un contacto de emergencia y lo asocia a un estudiante si se recibe el publicId del estudiante
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public EmergencyContactDTO createEmergencyContact(CreateEmergencyContactDTO dto) {
+        EmergencyContact emergencyContact = new EmergencyContact(
+                dto.getFirstName(),
+                dto.getLastName(),
+                dto.getRelationship() != null ? dto.getRelationship() : "Otro", // Default relationship
+                dto.getPhone(),
+                dto.getEmail(),
+                dto.getAddress() != null ? dto.getAddress() : null // Puede ser nulo
+        );
+
+        this.emergencyContactRepository.save(emergencyContact);
+
+        if (dto.getStudentPublicId() != null && !dto.getStudentPublicId().isBlank()) {
+            var student = this.studentRepository.findByPublicId(dto.getStudentPublicId()).orElseThrow(() -> new StudentNotFoundException("No se encontró el estudiante con publicId: " + dto.getStudentPublicId()));
+            StudentEmergencyContact studentEmergencyContact = new StudentEmergencyContact(student.getPublicId(), emergencyContact.getPublicId());
+            this.studentEmergencyContactRepository.save(studentEmergencyContact);
+        }
+
+        return new EmergencyContactDTO(emergencyContact);
     }
 }

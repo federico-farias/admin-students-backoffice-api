@@ -49,6 +49,21 @@ public class StudentDTO {
     private Boolean isActive;
 
     // Constructor para crear desde entidad
+    public StudentDTO(Student student, List<String> emergencyContactIds, List<String> tutorIds) {
+        this.id = student.getId();
+        this.publicId = student.getPublicId();
+        this.firstName = student.getFirstName();
+        this.lastName = student.getLastName();
+        this.email = student.getEmail();
+        this.phone = student.getPhone();
+        this.dateOfBirth = student.getDateOfBirth();
+        this.address = student.getAddress();
+        this.isActive = student.getIsActive();
+        this.emergencyContactIds = emergencyContactIds; // Asumimos que los IDs de contactos de emergencia se pasan
+        this.tutorIds = tutorIds; // Asumimos que los IDs de tutores se pasan
+        // Los contactos de emergencia y tutores se cargarán por separado si es necesario
+    }
+
     public StudentDTO(Student student) {
         this.id = student.getId();
         this.publicId = student.getPublicId();
@@ -60,20 +75,6 @@ public class StudentDTO {
         this.address = student.getAddress();
         this.isActive = student.getIsActive();
         // Los contactos de emergencia y tutores se cargarán por separado si es necesario
-    }
-
-    // Constructor para creación (sin publicId)
-    public StudentDTO(String firstName, String lastName, String email, String phone,
-                     LocalDate dateOfBirth, String address, List<String> emergencyContactIds,
-                     List<String> tutorIds) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phone = phone;
-        this.dateOfBirth = dateOfBirth;
-        this.address = address;
-        this.emergencyContactIds = emergencyContactIds;
-        this.tutorIds = tutorIds;
     }
 
     // Utility methods

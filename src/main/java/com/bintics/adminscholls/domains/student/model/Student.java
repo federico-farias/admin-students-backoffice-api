@@ -50,21 +50,6 @@ public class Student extends BaseEntity {
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
-    @NotBlank(message = "El nombre del padre/madre es obligatorio")
-    @Size(max = 200)
-    @Column(name = "parent_name", nullable = false)
-    private String parentName;
-
-    @NotBlank(message = "El teléfono del padre/madre es obligatorio")
-    @Size(max = 20)
-    @Column(name = "parent_phone", nullable = false)
-    private String parentPhone;
-
-    @Email(message = "El email del padre/madre debe tener un formato válido")
-    @Size(max = 255)
-    @Column(name = "parent_email")
-    private String parentEmail;
-
     @NotBlank(message = "La dirección es obligatoria")
     @Size(max = 500)
     @Column(name = "address", nullable = false)
@@ -73,19 +58,6 @@ public class Student extends BaseEntity {
     @Builder.Default
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
-
-    // Emergency Contact
-    @Size(max = 200)
-    @Column(name = "emergency_contact_name")
-    private String emergencyContactName;
-
-    @Size(max = 20)
-    @Column(name = "emergency_contact_phone")
-    private String emergencyContactPhone;
-
-    @Size(max = 100)
-    @Column(name = "emergency_contact_relationship")
-    private String emergencyContactRelationship;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -108,6 +80,7 @@ public class Student extends BaseEntity {
         this.phone = phone;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
+        this.isActive = true; // Por defecto, el estudiante es activo al crearse
     }
 
     @PrePersist

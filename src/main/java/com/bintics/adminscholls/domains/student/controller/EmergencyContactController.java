@@ -1,5 +1,6 @@
 package com.bintics.adminscholls.domains.student.controller;
 
+import com.bintics.adminscholls.domains.student.dto.CreateEmergencyContactDTO;
 import com.bintics.adminscholls.domains.student.dto.EmergencyContactDTO;
 import com.bintics.adminscholls.domains.student.service.EmergencyContactService;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -66,5 +68,14 @@ public class EmergencyContactController {
 
         List<EmergencyContactDTO> contacts = emergencyContactService.searchEmergencyContactsList(search);
         return ResponseEntity.ok(contacts);
+    }
+
+    /**
+     * Crea un contacto de emergencia y lo asocia a un estudiante si se recibe el publicId
+     */
+    @PostMapping
+    public ResponseEntity<EmergencyContactDTO> createEmergencyContact(@Validated @RequestBody CreateEmergencyContactDTO dto) {
+        EmergencyContactDTO created = emergencyContactService.createEmergencyContact(dto);
+        return ResponseEntity.status(201).body(created);
     }
 }
