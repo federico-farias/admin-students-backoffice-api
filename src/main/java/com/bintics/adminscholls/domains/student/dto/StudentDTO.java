@@ -38,9 +38,12 @@ public class StudentDTO {
     @Size(max = 500, message = "La dirección no puede exceder 500 caracteres")
     private String address;
 
-    // Lista de publicId de contactos de emergencia
+    // Lista de publicId de contactos de emergencia (para crear/actualizar)
     @NotEmpty(message = "Debe proporcionar al menos un contacto de emergencia")
     private List<String> emergencyContactIds;
+
+    // Lista de objetos completos de contactos de emergencia (solo para lectura)
+    private List<EmergencyContactDTO> emergencyContacts;
 
     // Lista de publicId de tutores
     @NotEmpty(message = "Debe proporcionar al menos un tutor")
@@ -49,7 +52,7 @@ public class StudentDTO {
     private Boolean isActive;
 
     // Constructor para crear desde entidad
-    public StudentDTO(Student student, List<String> emergencyContactIds, List<String> tutorIds) {
+    public StudentDTO(Student student, List<EmergencyContactDTO> emergencyContacts, List<String> tutorIds) {
         this.id = student.getId();
         this.publicId = student.getPublicId();
         this.firstName = student.getFirstName();
@@ -59,9 +62,8 @@ public class StudentDTO {
         this.dateOfBirth = student.getDateOfBirth();
         this.address = student.getAddress();
         this.isActive = student.getIsActive();
-        this.emergencyContactIds = emergencyContactIds; // Asumimos que los IDs de contactos de emergencia se pasan
-        this.tutorIds = tutorIds; // Asumimos que los IDs de tutores se pasan
-        // Los contactos de emergencia y tutores se cargarán por separado si es necesario
+        this.emergencyContacts = emergencyContacts; // Solo para lectura
+        this.tutorIds = tutorIds;
     }
 
     public StudentDTO(Student student) {

@@ -1,5 +1,6 @@
 package com.bintics.adminscholls.domains.student.service;
 
+import com.bintics.adminscholls.domains.student.dto.EmergencyContactDTO;
 import com.bintics.adminscholls.domains.student.model.EmergencyContact;
 import com.bintics.adminscholls.domains.student.repository.EmergencyContactRepository;
 import com.bintics.adminscholls.domains.student.repository.TutorRepository;
@@ -54,27 +55,35 @@ public List<StudentDTO> getActiveStudents() {
     }
 
     private StudentDTO mapStudentWithContactsAndTutors(Student s) {
-        var emergencyContactIds = this.studentEmergencyContactRepository.findByStudentPublicId(s.getPublicId()).stream()
+        // Para lectura: obtener objetos completos de contactos de emergencia
+        var emergencyContacts = this.studentEmergencyContactRepository.findByStudentPublicId(s.getPublicId()).stream()
                 .map(e -> this.emergencyContactRepository.findByPublicId(e.getEmergencyContactPublicId()))
                 .filter(Optional::isPresent)
-                .map(opt -> opt.get().getPublicId())
+                .map(opt -> new EmergencyContactDTO(opt.get()))
+                .toList();
+
+        // Para escritura: obtener solo los publicId de contactos de emergencia
+        var emergencyContactIds = this.studentEmergencyContactRepository.findByStudentPublicId(s.getPublicId()).stream()
+                .map(StudentEmergencyContact::getEmergencyContactPublicId)
                 .toList();
 
         var tutorIds = this.studentTutorRepository.findByStudentPublicId(s.getPublicId()).stream()
                 .map(StudentTutor::getTutorPublicId)
                 .toList();
 
-        return new StudentDTO(s, emergencyContactIds, tutorIds);
+        StudentDTO dto = new StudentDTO(s, emergencyContacts, tutorIds);
+        dto.setEmergencyContactIds(emergencyContactIds); // Asignar la lista de IDs para escritura
+        return dto;
     }
 
     public Optional<StudentDTO> getStudentById(Long id) {
         return studentRepository.findById(id)
-                .map(StudentDTO::new);
+                .map(this::mapStudentWithContactsAndTutors);
     }
 
     public Optional<StudentDTO> getStudentByPublicId(String publicId) {
         return studentRepository.findByPublicId(publicId)
-                .map(StudentDTO::new);
+                .map(this::mapStudentWithContactsAndTutors);
     }
 
     public StudentDTO createStudent(StudentDTO studentDTO) {
