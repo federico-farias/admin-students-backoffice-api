@@ -206,7 +206,19 @@ public List<StudentDTO> getActiveStudents() {
         student.setAddress(studentDTO.getAddress());
 
         Student updatedStudent = studentRepository.save(student);
-        return new StudentDTO(updatedStudent);
+
+        // Actualizar contactos de emergencia
+        // Eliminar asociaciones actuales
+        studentEmergencyContactRepository.deleteByStudentPublicId(student.getPublicId());
+        // Asociar los nuevos contactos de emergencia
+        associateEmergencyContacts(student.getPublicId(), studentDTO.getEmergencyContactIds());
+
+        // Actualizar tutores
+        studentTutorRepository.deleteByStudentPublicId(student.getPublicId());
+        associateTutors(student.getPublicId(), studentDTO.getTutorIds());
+
+        // Retornar DTO actualizado con contactos y tutores completos
+        return mapStudentWithContactsAndTutors(updatedStudent);
     }
 
     public void deleteStudent(String publicId) {
