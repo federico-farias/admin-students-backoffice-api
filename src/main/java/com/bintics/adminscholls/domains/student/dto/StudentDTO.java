@@ -45,14 +45,20 @@ public class StudentDTO {
     // Lista de objetos completos de contactos de emergencia (solo para lectura)
     private List<EmergencyContactDTO> emergencyContacts;
 
-    // Lista de publicId de tutores
+    // Lista de publicId de tutores (para crear/actualizar)
     @NotEmpty(message = "Debe proporcionar al menos un tutor")
     private List<String> tutorIds;
 
+    // Lista de objetos completos de tutores (solo para lectura)
+    private List<TutorDTO> tutors;
+
     private Boolean isActive;
 
+    // Fecha de registro (solo para lectura)
+    private java.time.LocalDateTime createdAt;
+
     // Constructor para crear desde entidad
-    public StudentDTO(Student student, List<EmergencyContactDTO> emergencyContacts, List<String> tutorIds) {
+    public StudentDTO(Student student, List<EmergencyContactDTO> emergencyContacts, List<String> emergencyContactIds, List<String> tutorIds, List<TutorDTO> tutors) {
         this.id = student.getId();
         this.publicId = student.getPublicId();
         this.firstName = student.getFirstName();
@@ -62,8 +68,11 @@ public class StudentDTO {
         this.dateOfBirth = student.getDateOfBirth();
         this.address = student.getAddress();
         this.isActive = student.getIsActive();
+        this.createdAt = student.getCreatedAt();
         this.emergencyContacts = emergencyContacts; // Solo para lectura
+        this.emergencyContactIds = emergencyContactIds; // Para crear/actualizar
         this.tutorIds = tutorIds;
+        this.tutors = tutors; // Solo para lectura
     }
 
     public StudentDTO(Student student) {
@@ -76,6 +85,7 @@ public class StudentDTO {
         this.dateOfBirth = student.getDateOfBirth();
         this.address = student.getAddress();
         this.isActive = student.getIsActive();
+        this.createdAt = student.getCreatedAt();
         // Los contactos de emergencia y tutores se cargarán por separado si es necesario
     }
 

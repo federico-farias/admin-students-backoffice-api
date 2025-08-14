@@ -1,6 +1,7 @@
 package com.bintics.adminscholls.domains.student.service;
 
 import com.bintics.adminscholls.domains.student.dto.EmergencyContactDTO;
+import com.bintics.adminscholls.domains.student.dto.TutorDTO;
 import com.bintics.adminscholls.domains.student.model.EmergencyContact;
 import com.bintics.adminscholls.domains.student.repository.EmergencyContactRepository;
 import com.bintics.adminscholls.domains.student.repository.TutorRepository;
@@ -67,13 +68,20 @@ public List<StudentDTO> getActiveStudents() {
                 .map(StudentEmergencyContact::getEmergencyContactPublicId)
                 .toList();
 
+        // Para lectura: obtener objetos completos de tutores
+        var tutors = this.studentTutorRepository.findByStudentPublicId(s.getPublicId()).stream()
+                .map(e -> this.tutorRepository.findByPublicId(e.getTutorPublicId()))
+                .filter(Optional::isPresent)
+                .map(opt -> new TutorDTO(opt.get()))
+                .toList();
+
+        // Para escritura: obtener solo los publicId de tutores
         var tutorIds = this.studentTutorRepository.findByStudentPublicId(s.getPublicId()).stream()
                 .map(StudentTutor::getTutorPublicId)
                 .toList();
 
-        StudentDTO dto = new StudentDTO(s, emergencyContacts, tutorIds);
-        dto.setEmergencyContactIds(emergencyContactIds); // Asignar la lista de IDs para escritura
-        return dto;
+        // Usar el constructor que coincide con el modelo y DTO
+        return new StudentDTO(s, emergencyContacts, emergencyContactIds, tutorIds, tutors);
     }
 
     public Optional<StudentDTO> getStudentById(Long id) {
