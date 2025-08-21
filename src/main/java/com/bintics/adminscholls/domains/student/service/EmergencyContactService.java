@@ -101,7 +101,7 @@ public class EmergencyContactService {
 
         if (dto.getStudentPublicId() != null && !dto.getStudentPublicId().isBlank()) {
             var student = this.studentRepository.findByPublicId(dto.getStudentPublicId()).orElseThrow(() -> new StudentNotFoundException("No se encontró el estudiante con publicId: " + dto.getStudentPublicId()));
-            StudentEmergencyContact studentEmergencyContact = new StudentEmergencyContact(student.getPublicId(), emergencyContact.getPublicId());
+            StudentEmergencyContact studentEmergencyContact = new StudentEmergencyContact(student.getPublicId(), emergencyContact.getPublicId(), dto.getRelationship());
             this.studentEmergencyContactRepository.save(studentEmergencyContact);
         }
 

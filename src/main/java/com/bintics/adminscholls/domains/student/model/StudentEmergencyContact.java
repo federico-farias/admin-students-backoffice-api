@@ -25,8 +25,12 @@ public class StudentEmergencyContact extends BaseEntity {
     @Column(name = "emergency_contact_public_id", nullable = false)
     private String emergencyContactPublicId;
 
-    public StudentEmergencyContact(String studentPublicId, String emergencyContactPublicId) {
+    @Column(name = "relationship", nullable = false)
+    private String relationship;
+
+    public StudentEmergencyContact(String studentPublicId, String emergencyContactPublicId, String relationship) {
         this.studentPublicId = studentPublicId;
         this.emergencyContactPublicId = emergencyContactPublicId;
+        this.relationship = relationship;
     }
 }
