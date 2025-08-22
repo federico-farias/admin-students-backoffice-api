@@ -12,7 +12,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class StudentTutor extends BaseEntity {
 
     @Id
@@ -25,12 +24,16 @@ public class StudentTutor extends BaseEntity {
     @Column(name = "tutor_public_id", nullable = false)
     private String tutorPublicId;
 
+    @Column(name = "relationship", nullable = false)
+    private String relationship;
+
     @Column(name = "is_primary_tutor", nullable = false)
     private Boolean isPrimaryTutor = false;
 
-    public StudentTutor(String studentPublicId, String tutorPublicId, Boolean isPrimaryTutor) {
+    public StudentTutor(String studentPublicId, String tutorPublicId, String relationship, Boolean isPrimaryTutor) {
         this.studentPublicId = studentPublicId;
         this.tutorPublicId = tutorPublicId;
+        this.relationship = relationship;
         this.isPrimaryTutor = isPrimaryTutor != null ? isPrimaryTutor : false;
     }
 }

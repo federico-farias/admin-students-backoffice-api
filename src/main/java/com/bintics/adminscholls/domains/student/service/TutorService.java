@@ -114,6 +114,7 @@ public class TutorService {
             StudentTutor studentTutor = new StudentTutor(
                     createTutorDTO.getStudentPublicId().trim(),
                     savedTutor.getPublicId(),
+                    createTutorDTO.getRelationship(),
                     false // No es tutor primario por defecto
             );
             studentTutorRepository.save(studentTutor);

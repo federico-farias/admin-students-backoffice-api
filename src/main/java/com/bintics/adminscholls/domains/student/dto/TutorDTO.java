@@ -1,5 +1,6 @@
 package com.bintics.adminscholls.domains.student.dto;
 
+import com.bintics.adminscholls.domains.student.model.StudentTutor;
 import com.bintics.adminscholls.domains.student.model.Tutor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

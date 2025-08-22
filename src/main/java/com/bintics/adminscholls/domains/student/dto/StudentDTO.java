@@ -45,12 +45,12 @@ public class StudentDTO {
     @NotEmpty(message = "Debe proporcionar al menos un contacto de emergencia")
     private List<StudentEmergencyContactRequest> emergencyContactsInfo;
 
-    // Lista de publicId de tutores (para crear/actualizar)
-    @NotEmpty(message = "Debe proporcionar al menos un tutor")
-    private List<String> tutorIds;
-
     // Lista de objetos completos de tutores (solo para lectura)
     private List<TutorDTO> tutors;
+
+    // Lista de relaciones estudiante-tutor (para crear/actualizar)
+    @NotEmpty(message = "Debe proporcionar al menos un tutor")
+    private List<TutorRequest> tutorsInfo;
 
     private Boolean isActive;
 
@@ -58,7 +58,7 @@ public class StudentDTO {
     private java.time.LocalDateTime createdAt;
 
     // Constructor para crear desde entidad
-    public StudentDTO(Student student, List<EmergencyContactDTO> emergencyContacts, List<StudentEmergencyContactRequest> emergencyContactsInfo, List<String> tutorIds, List<TutorDTO> tutors) {
+    public StudentDTO(Student student, List<EmergencyContactDTO> emergencyContacts, List<StudentEmergencyContactRequest> emergencyContactsInfo, List<TutorDTO> tutors, List<TutorRequest> tutorsInfo) {
         this.id = student.getId();
         this.publicId = student.getPublicId();
         this.firstName = student.getFirstName();
@@ -70,9 +70,9 @@ public class StudentDTO {
         this.isActive = student.getIsActive();
         this.createdAt = student.getCreatedAt();
         this.emergencyContacts = emergencyContacts; // Solo para lectura
-        this.emergencyContactsInfo = emergencyContactsInfo;
-        this.tutorIds = tutorIds;
+        this.emergencyContactsInfo = emergencyContactsInfo; // crea/actualiza
         this.tutors = tutors; // Solo para lectura
+        this.tutorsInfo = tutorsInfo; // crea/actualiza
     }
 
     public StudentDTO(Student student) {

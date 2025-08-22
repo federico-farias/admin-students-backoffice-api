@@ -1,13 +1,10 @@
 package com.bintics.adminscholls.domains.student.service;
 
-import com.bintics.adminscholls.domains.student.dto.EmergencyContactDTO;
-import com.bintics.adminscholls.domains.student.dto.StudentEmergencyContactRequest;
-import com.bintics.adminscholls.domains.student.dto.TutorDTO;
+import com.bintics.adminscholls.domains.student.dto.*;
 import com.bintics.adminscholls.domains.student.model.EmergencyContact;
 import com.bintics.adminscholls.domains.student.repository.EmergencyContactRepository;
 import com.bintics.adminscholls.domains.student.repository.TutorRepository;
 import com.bintics.adminscholls.domains.student.repository.StudentTutorRepository;
-import com.bintics.adminscholls.domains.student.dto.StudentDTO;
 import com.bintics.adminscholls.domains.student.exception.EmergencyContactsNotFoundException;
 import com.bintics.adminscholls.domains.student.exception.StudentAlreadyExistsException;
 import com.bintics.adminscholls.domains.student.exception.TutorsNotFoundException;
@@ -68,7 +65,7 @@ public List<StudentDTO> getActiveStudents() {
         var emergencyContactsInfo = this.studentEmergencyContactRepository.findByStudentPublicId(s.getPublicId()).stream()
                 .map(e -> {
                     var info = new com.bintics.adminscholls.domains.student.dto.StudentEmergencyContactRequest();
-                    info.setEmergencyContactPublicId(e.getEmergencyContactPublicId());
+                    info.setPublicId(e.getEmergencyContactPublicId());
                     info.setRelationship(e.getRelationship());
                     return info;
                 })
@@ -82,12 +79,12 @@ public List<StudentDTO> getActiveStudents() {
                 .toList();
 
         // Para escritura: obtener solo los publicId de tutores
-        var tutorIds = this.studentTutorRepository.findByStudentPublicId(s.getPublicId()).stream()
-                .map(StudentTutor::getTutorPublicId)
+        var tutorsInfo = this.studentTutorRepository.findByStudentPublicId(s.getPublicId()).stream()
+                .map(e -> new TutorRequest(e.getTutorPublicId(), e.getRelationship()))
                 .toList();
 
         // Usar el constructor que coincide con el modelo y DTO
-        return new StudentDTO(s, emergencyContacts, emergencyContactsInfo, tutorIds, tutors);
+        return new StudentDTO(s, emergencyContacts, emergencyContactsInfo, tutors, tutorsInfo);
     }
 
     public Optional<StudentDTO> getStudentById(Long id) {
@@ -106,12 +103,16 @@ public List<StudentDTO> getActiveStudents() {
 
         // 2. Validar que todos los contactos de emergencia existan
         var contactIds = studentDTO.getEmergencyContactsInfo().stream()
-            .map(StudentEmergencyContactRequest::getEmergencyContactPublicId)
+            .map(StudentEmergencyContactRequest::getPublicId)
             .toList();
         validateEmergencyContactsExist(contactIds);
 
+        var tutorIds = studentDTO.getTutorsInfo().stream()
+                .map(TutorRequest::getPublicId)
+                .toList();
+
         // 3. Validar que todos los tutores existan
-        validateTutorsExist(studentDTO.getTutorIds());
+        validateTutorsExist(tutorIds);
 
         // 4. Crear el estudiante
         Student student = new Student(
@@ -129,7 +130,7 @@ public List<StudentDTO> getActiveStudents() {
         associateEmergencyContactsWithRelationship(savedStudent.getPublicId(), studentDTO.getEmergencyContactsInfo());
 
         // 6. Asociar los tutores
-        associateTutors(savedStudent.getPublicId(), studentDTO.getTutorIds());
+        associateTutors(savedStudent.getPublicId(), studentDTO.getTutorsInfo());
 
         return mapStudentWithContactsAndTutors(savedStudent);
     }
@@ -138,7 +139,7 @@ public List<StudentDTO> getActiveStudents() {
         for (StudentEmergencyContactRequest info : emergencyContactsInfo) {
             StudentEmergencyContact association = new StudentEmergencyContact(
                 studentPublicId,
-                info.getEmergencyContactPublicId(),
+                info.getPublicId(),
                 info.getRelationship()
             );
             studentEmergencyContactRepository.save(association);
@@ -199,9 +200,13 @@ public List<StudentDTO> getActiveStudents() {
         }
     }
 
-    private void associateTutors(String studentPublicId, List<String> tutorIds) {
-        for (String tutorId : tutorIds) {
-            StudentTutor association = new StudentTutor(studentPublicId, tutorId, false);
+    private void associateTutors(String studentPublicId, List<TutorRequest> tutorsInfo) {
+        if (tutorsInfo == null || tutorsInfo.isEmpty()) {
+            throw new NoTutorsProvidedException();
+        }
+
+        for (TutorRequest info : tutorsInfo) {
+            StudentTutor association = new StudentTutor(studentPublicId, info.getPublicId(), info.getRelationship(), false);
             studentTutorRepository.save(association);
         }
     }
@@ -226,7 +231,7 @@ public List<StudentDTO> getActiveStudents() {
 
         // Actualizar tutores
         studentTutorRepository.deleteByStudentPublicId(student.getPublicId());
-        associateTutors(student.getPublicId(), studentDTO.getTutorIds());
+        associateTutors(student.getPublicId(), studentDTO.getTutorsInfo());
 
         // Retornar DTO actualizado con contactos y tutores completos
         return mapStudentWithContactsAndTutors(updatedStudent);
