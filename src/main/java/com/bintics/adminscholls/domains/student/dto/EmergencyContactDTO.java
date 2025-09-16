@@ -15,7 +15,6 @@ public class EmergencyContactDTO {
     private String publicId;
     private String firstName;
     private String lastName;
-    private String relationship;
     private String phone;
     private String email;
     private String address;
@@ -26,7 +25,6 @@ public class EmergencyContactDTO {
         this.publicId = contact.getPublicId();
         this.firstName = contact.getFirstName();
         this.lastName = contact.getLastName();
-        this.relationship = contact.getRelationship();
         this.phone = contact.getPhone();
         this.email = contact.getEmail();
         this.address = contact.getAddress();

@@ -49,11 +49,6 @@ public class Tutor extends BaseEntity {
     @Column(name = "address")
     private String address;
 
-    @NotBlank(message = "La relación con el estudiante es obligatoria")
-    @Size(max = 50, message = "La relación no puede exceder 50 caracteres")
-    @Column(name = "relationship", nullable = false)
-    private String relationship; // Padre, Madre, Tutor Legal, etc.
-
     @Size(max = 50, message = "La ocupación no puede exceder 50 caracteres")
     @Column(name = "occupation")
     private String occupation;
@@ -66,13 +61,12 @@ public class Tutor extends BaseEntity {
     }
 
     public Tutor(String firstName, String lastName, String email, String phone,
-                String address, String relationship, String occupation) {
+                String address, String occupation) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
         this.address = address;
-        this.relationship = relationship;
         this.occupation = occupation;
         generatePublicId();
     }

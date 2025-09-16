@@ -35,11 +35,6 @@ public class EmergencyContact extends BaseEntity {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @NotBlank(message = "La relación es obligatoria")
-    @Size(max = 50, message = "La relación no puede exceder 50 caracteres")
-    @Column(name = "relationship", nullable = false)
-    private String relationship;
-
     @NotBlank(message = "El teléfono es obligatorio")
     @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
     @Column(name = "phone", nullable = false)
@@ -61,11 +56,10 @@ public class EmergencyContact extends BaseEntity {
         }
     }
 
-    public EmergencyContact(String firstName, String lastName, String relationship,
+    public EmergencyContact(String firstName, String lastName,
                            String phone, String email, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.relationship = relationship;
         this.phone = phone;
         this.email = email;
         this.address = address;

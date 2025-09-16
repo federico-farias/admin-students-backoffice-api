@@ -103,7 +103,6 @@ public class TutorService {
                 createTutorDTO.getEmail(),
                 createTutorDTO.getPhone(),
                 createTutorDTO.getAddress(),
-                createTutorDTO.getRelationship(),
                 createTutorDTO.getOccupation()
         );
 

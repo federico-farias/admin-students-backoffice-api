@@ -19,7 +19,6 @@ public class TutorDTO {
     private String email;
     private String phone;
     private String address;
-    private String relationship;
     private String occupation;
     private Boolean isActive;
 
@@ -31,7 +30,6 @@ public class TutorDTO {
         this.email = tutor.getEmail();
         this.phone = tutor.getPhone();
         this.address = tutor.getAddress();
-        this.relationship = tutor.getRelationship();
         this.occupation = tutor.getOccupation();
         this.isActive = tutor.getIsActive();
     }

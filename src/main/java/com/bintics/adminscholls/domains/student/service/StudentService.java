@@ -54,37 +54,34 @@ public List<StudentDTO> getActiveStudents() {
     }
 
     private StudentDTO mapStudentWithContactsAndTutors(Student s) {
-        // Para lectura: obtener objetos completos de contactos de emergencia
-        var emergencyContacts = this.studentEmergencyContactRepository.findByStudentPublicId(s.getPublicId()).stream()
-                .map(e -> this.emergencyContactRepository.findByPublicId(e.getEmergencyContactPublicId()))
-                .filter(Optional::isPresent)
-                .map(opt -> new EmergencyContactDTO(opt.get()))
-                .toList();
-
         // Para lectura: obtener la relación específica de cada contacto de emergencia
         var emergencyContactsInfo = this.studentEmergencyContactRepository.findByStudentPublicId(s.getPublicId()).stream()
                 .map(e -> {
-                    var info = new com.bintics.adminscholls.domains.student.dto.StudentEmergencyContactRequest();
+                    var info = new com.bintics.adminscholls.domains.student.dto.StudentEmergencyContactRequest(
+                            e.getEmergencyContactPublicId(),
+                            e.getRelationship(),
+                            new EmergencyContactDTO(
+                                    this.emergencyContactRepository.findByPublicId(e.getEmergencyContactPublicId())
+                                            .orElseThrow(() -> new RuntimeException("No se encontró el contacto de emergencia"))
+                            ));
                     info.setPublicId(e.getEmergencyContactPublicId());
                     info.setRelationship(e.getRelationship());
                     return info;
                 })
                 .toList();
 
-        // Para lectura: obtener objetos completos de tutores
-        var tutors = this.studentTutorRepository.findByStudentPublicId(s.getPublicId()).stream()
-                .map(e -> this.tutorRepository.findByPublicId(e.getTutorPublicId()))
-                .filter(Optional::isPresent)
-                .map(opt -> new TutorDTO(opt.get()))
-                .toList();
-
         // Para escritura: obtener solo los publicId de tutores
         var tutorsInfo = this.studentTutorRepository.findByStudentPublicId(s.getPublicId()).stream()
-                .map(e -> new TutorRequest(e.getTutorPublicId(), e.getRelationship()))
+                .map(e -> new TutorRequest(
+                        e.getTutorPublicId(),
+                        e.getRelationship(),
+                        new TutorDTO(this.tutorRepository.findByPublicId(e.getTutorPublicId())
+                                .orElseThrow(() -> new RuntimeException("No se encontró el tutor"))
+                        )))
                 .toList();
 
         // Usar el constructor que coincide con el modelo y DTO
-        return new StudentDTO(s, emergencyContacts, emergencyContactsInfo, tutors, tutorsInfo);
+        return new StudentDTO(s, emergencyContactsInfo, tutorsInfo);
     }
 
     public Optional<StudentDTO> getStudentById(Long id) {

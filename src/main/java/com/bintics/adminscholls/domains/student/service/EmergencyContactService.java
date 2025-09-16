@@ -91,7 +91,6 @@ public class EmergencyContactService {
         EmergencyContact emergencyContact = new EmergencyContact(
                 dto.getFirstName(),
                 dto.getLastName(),
-                dto.getRelationship() != null ? dto.getRelationship() : "Otro", // Default relationship
                 dto.getPhone(),
                 dto.getEmail(),
                 dto.getAddress() != null ? dto.getAddress() : null // Puede ser nulo
